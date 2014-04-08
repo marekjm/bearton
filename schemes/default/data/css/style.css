@@ -1,0 +1,7 @@
+html, body {
+    /* zeroing margins and padding to make a clean canvas to work on */
+    margin: 0;
+    padding: 0;
+    color: #000000;
+    background-color: #0f0f0f;
+}
