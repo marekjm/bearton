@@ -1,0 +1,8 @@
+{
+    "css": [
+        {"source": "data/css/style.css"}
+    ],
+    "js": [
+        {"source": "data/js/main.js"}
+    ]
+}
