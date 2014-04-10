@@ -1,11 +1,39 @@
 import json
 import os
 import sys
+import warnings
 
 import muspyche
 
 from .. import util
 from .. import conf
+
+
+def getcontext(schemepath, element):
+    elpath = os.path.join(schemepath, 'elements', element)
+    cntxt = util.readfile(os.path.join(elpath, 'context.json'))
+    try:
+        context, error = json.loads(cntxt), None
+    except Exception as e:
+        context, error = {}, e
+    finally:
+        pass
+    if error is not None:
+        raise type(e)('while loading context for: {0}: {1}'.format(os.path.abspath(elpath), e))
+    return context
+
+def getmeta(schemepath, element):
+    elpath = os.path.join(schemepath, 'elements', element)
+    meta = util.readfile(os.path.join(elpath, 'meta.json'))
+    try:
+        meta, error = json.loads(meta), None
+    except Exception as e:
+        meta, error = {}, e
+    finally:
+        pass
+    if error is not None:
+        raise type(e)('while loading metadata for: {0}: {1}'.format(os.path.abspath(elpath), e))
+    return meta
 
 
 class Element:
@@ -20,33 +48,36 @@ class Element:
     def _loadtemplate(self, schemepath):
         elpath = os.path.join(schemepath, 'elements', self._element)
         tmplt = util.readfile(os.path.join(elpath, 'template.mustache'))
-        self._template = muspyche.parser.parse(tmplt, lookup=[elpath, os.path.join(schemepath, 'elements')])
-
-    def _loadcontext(self, schemepath):
-        elpath = os.path.join(schemepath, 'elements', self._element)
-        cntxt = util.readfile(os.path.join(elpath, 'context.json'))
-        self._context = json.loads(cntxt)
+        try:
+            self._template = muspyche.parser.parse(tmplt, lookup=[elpath, os.path.join(schemepath, 'elements')])
+        except Exception as e:
+            raise type(e)('while loading template for: {0}: {1}'.format(os.path.abspath(elpath), e))
 
     def _loadmeta(self, schemepath):
-        elpath = os.path.join(schemepath, 'elements', self._element)
-        meta = util.readfile(os.path.join(elpath, 'meta.json'))
-        self._meta = json.loads(meta)
-
-    def load(self):
-        """Loads element's template, context and metadata.
-        """
-        schemepath = os.path.join('schemes', conf.Configuration().load().get('scheme'))
-        self._loadtemplate(schemepath)
-        self._loadcontext(schemepath)
-        self._loadmeta(schemepath)
-        return self
+        self._meta = getmeta(schemepath, self._element)
 
     def _gathercontexts(self, schemepath):
-        print(self._meta['requires']['contexts'])
+        contexts = self._meta['requires']['contexts'][:]
+        for element in self._meta['requires']['contexts']:
+            meta = getmeta(schemepath, element)
+            contexts.extend([req for req in meta['requires']['contexts'] if req not in contexts])
+        return contexts
 
-    def prepare(self):
-        """Prepares element's elements.
+    def _loadcontext(self, schemepath):
+        required = self._gathercontexts(schemepath)
+        required.insert(0, self._element)
+        for element in required:
+            cntxt = getcontext(schemepath, element)
+            for k, v in cntxt.items():
+                if k in self._context:
+                    warnings.warn('bearton: warning: conflicting key in required contexts: {0}: {1} -> {2}'.format(k, self._context[k], v))
+                self._context[k] = v
+
+    def load(self):
+        """Loads element's metadata, context(s) and template.
         """
         schemepath = os.path.join('schemes', conf.Configuration().load().get('scheme'))
-        self._gathercontexts(schemepath)
+        self._loadmeta(schemepath)
+        self._loadcontext(schemepath)
+        self._loadtemplate(schemepath)
         return self
