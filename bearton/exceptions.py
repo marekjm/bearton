@@ -1,0 +1,2 @@
+class BeartonError(Exception):
+    pass

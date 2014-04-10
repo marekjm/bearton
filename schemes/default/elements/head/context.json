@@ -1,8 +1,15 @@
 {
+    "charset": "utf-8",
+    "meta": [
+        {"name": "author", "content": "Joe Random Hacker"},
+        {"name": "keywords", "content": "bearton, python, python3, cms, websites"}
+    ],
     "css": [
-        {"source": "data/css/style.css"}
+        {"source": "style.css"},
+        {"source": "text.css"},
+        {"source": "fonts.css"}
     ],
     "js": [
-        {"source": "data/js/main.js"}
+        {"source": "main.js"}
     ]
 }
