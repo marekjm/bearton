@@ -8,7 +8,7 @@ from .exceptions import *
 class Configuration:
     """Class implementing interface to Bearton site configuration.
     """
-    def __init__(self, path=''):
+    def __init__(self, path='.'):
         self._path = path
         self._conf = {}
 
@@ -28,15 +28,15 @@ class Configuration:
         return iter(self._conf)
 
     def _getpath(self):
-        """Tries to find a path to conf dictionary.
+        """Tries to find a path to config JSON file.
         """
-        base, path = os.path.abspath('./site'), ''
+        base, path = os.path.abspath(self._path), ''
         while True and os.path.split(base)[1] != '':
-            path = os.path.join(base, 'conf.json')
+            path = os.path.join(base, '.bearton', 'config.json')
             if os.path.isfile(path): break
             base, path = os.path.split(base)[0], ''
         if not path:
-            raise BeartonError('cannot find Bearton configuration file: start directory: {0}'.format(os.path.abspath('./site')))
+            raise BeartonError('cannot find Bearton configuration file: start directory: {0}'.format(os.path.abspath(self._path)))
         else:
             return path
 
@@ -64,3 +64,14 @@ class Configuration:
     def remove(self, key):
         del self._conf[key]
         return self
+
+    def pop(self, key):
+        value = self.get(key)
+        self.remove(key)
+        return value
+
+    def kvalues(self):
+        return [(k, v) for k, v in self._conf.items()]
+
+    def keys(self):
+        return [key for key in self]
