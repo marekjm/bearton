@@ -29,7 +29,7 @@ class Messenger:
         """Write debug message to stream.
         """
         msg = 'debug: {0}\n'.format(msg)
-        self._stream.write(msg)
+        if self._debugging: self._stream.write(msg)
 
 
 def readfile(path, encoding='utf-8'):
