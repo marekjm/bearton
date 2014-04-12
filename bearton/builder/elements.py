@@ -6,7 +6,7 @@ import warnings
 import muspyche
 
 from .. import util
-from .. import conf
+from .. import config
 
 
 def getcontext(schemepath, element):
