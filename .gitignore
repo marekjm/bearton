@@ -20,4 +20,4 @@ __pycache__/
 # ----
 
 # Test site directory
-site/
+sitebuild/
