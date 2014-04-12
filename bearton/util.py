@@ -20,7 +20,8 @@ class Messenger:
     def message(self, msg, verbosity=0):
         """Write message to stream.
         """
-        if (verbosity < self._verbosity) or self._quiet: return
+        if self._quiet: return
+        if self._verbosity < verbosity: return
         msg = '{0}\n'.format(msg)
         self._stream.write(msg)
 
