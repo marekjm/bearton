@@ -1,0 +1,43 @@
+{
+    "init": [
+        {
+            "short": "w",
+            "long": "where",
+            "arguments": ["str"],
+            "help": "set <where> directory, instead of default current working directory, as the target init-directory"
+        },
+        {
+            "short": "f",
+            "long": "force",
+            "help": "write even if directories are already present (e.g. when reinitializing)"
+        },
+        {
+            "short": "s",
+            "long": "schemes",
+            "arguments": ["str"],
+            "help": "set location of the schemes, they will be copied from there (overrides default)"
+        }
+    ],
+    "__global__": [
+        {
+            "short": "v",
+            "long": "verbose",
+            "help": "display more verbose output"
+        },
+        {
+            "short": "d",
+            "long": "debug",
+            "help": "display debugging output"
+        },
+        {
+            "short": "q",
+            "long": "quiet",
+            "help": "do not print normal messages"
+        },
+        {
+            "short": "h",
+            "long": "help",
+            "help": "dispay help message"
+        }
+    ]
+}

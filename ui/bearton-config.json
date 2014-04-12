@@ -1,0 +1,77 @@
+{
+    "get": [
+        {
+            "short": "k",
+            "long": "key",
+            "arguments": ["str"],
+            "help": "get value of key"
+        },
+        {
+            "short": "l",
+            "long": "list",
+            "help": "list all keys (if verbose, list all key:value pairs)"
+        },
+        {
+            "short": "w",
+            "long": "where",
+            "arguments": ["str"],
+            "help": "set different target directory"
+        },
+        {
+            "short": "j",
+            "long": "json",
+            "help": "format output as JSON"
+        }
+    ],
+    "set": [
+        {
+            "short": "k",
+            "long": "key",
+            "arguments": ["str"],
+            "help": "set value of key"
+        },
+        {
+            "short": "v",
+            "long": "value",
+            "arguments": ["str"],
+            "requires": ["--key"],
+            "help": "give value to set"
+        }
+    ],
+    "rm": [
+        {
+            "short": "k",
+            "long": "key",
+            "arguments": ["str"],
+            "help": "remove key from config"
+        },
+        {
+            "short": "p",
+            "long": "pop",
+            "requires": ["--key"],
+            "help": "print value of the key before removing it"
+        }
+    ],
+    "__global__": [
+        {
+            "short": "v",
+            "long": "verbose",
+            "help": "display more verbose output"
+        },
+        {
+            "short": "d",
+            "long": "debug",
+            "help": "display debugging output"
+        },
+        {
+            "short": "q",
+            "long": "quiet",
+            "help": "do not print normal messages"
+        },
+        {
+            "short": "h",
+            "long": "help",
+            "help": "dispay help message"
+        }
+    ]
+}
