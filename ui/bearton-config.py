@@ -38,5 +38,13 @@ if str(ui) == 'get':
                 output = tmp
             for i in output:
                 msgr.message(i, 0)
+elif str(ui) == 'set':
+    key, value = '', ''
+    if ui.arguments: key = ui.arguments.pop(0)
+    if ui.arguments: value = ui.arguments.pop(0)
+    if '--key' in ui: key = ui.get('-k')
+    if '--value' in ui: value = ui.get('-v')
+    msgr.debug('{0} -> {1}'.format(key, value))
+    config.set(key, value)
 
 if str(ui) != '': config.store()

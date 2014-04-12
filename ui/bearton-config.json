@@ -12,12 +12,6 @@
             "help": "list all keys (if verbose, list all key:value pairs)"
         },
         {
-            "short": "w",
-            "long": "where",
-            "arguments": ["str"],
-            "help": "set different target directory"
-        },
-        {
             "short": "j",
             "long": "json",
             "help": "format output as JSON"
@@ -72,6 +66,12 @@
             "short": "h",
             "long": "help",
             "help": "dispay help message"
+        },
+        {
+            "short": "w",
+            "long": "where",
+            "arguments": ["str"],
+            "help": "set different target directory"
         }
     ]
 }
