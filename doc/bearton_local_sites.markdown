@@ -5,44 +5,34 @@ sent to the Net, one must use `bearton init` command.
 
 ----
 
-### Layouts
+### Separation of Bearton and site
 
-Bearton locals (**local s**ites) may have appear in one of two possible layouts;
-`outside` (which is the default) and `inside`.
+Each repository is divided into two parts: *inside* and *outside*.
+Inside part of the repository is the hidden `./.breaton` directory containing
+database, schemes and configuration.
+Outside is everything else.
 
-### *Outside* layout
+By default, only outside part is sent to the Net and displayed to site viewers.
+However, when full push to the server is done, the database is also sent -
+as a compressed tar archive.
 
-Outside layout means that Bearton data is outside of the built site.
-
-While rebuilding, everything in `./site` subdirectory is removed and then built.
-
-```
-bearton/
-    schemes/
-    config.json
-site/
-    index.html
-db/
-    dead0123beef4567feed8901deaf2345/
-        meta.json
-        context.json
-```
-
-### *Inside* layout
-
-Inside layout means that Bearton data is contained in a hidden directory inside
-site directory.
-
-While rebuilding, everything in current working directory - except `.bearton` subdirectory - is
-removed and then built.
+**Example site:**
 
 ```
 index.html
+blog.html
+blog/
+blog/2014/index.html
+blog/2014/04/index.html
+blog/2014/04/bearton_alpha.html
+                                       | outside part
+        -------------------------------|-------------
+                                       | inside  part
 .bearton/
-    schemes/
-    db/
-        dead0123beef4567feed8901deaf2345/
-            meta.json
-            context.json
-    config.json
+.bearton/schemes/
+.bearton/schemes/default/
+.bearton/db/
+.bearton/db/0123feed4567dead8901deaf2345beef6789
+.bearton/db/0123feed4567dead8901deaf2345beef6789/meta.json
+.bearton/db/0123feed4567dead8901deaf2345beef6789/context.json
 ```
