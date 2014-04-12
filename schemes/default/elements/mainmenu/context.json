@@ -1,0 +1,7 @@
+{
+    "menu_links": [
+        {"name": "HOME", "href": "/", "title": "Homepage"},
+        {"name": "Blog", "href": "/blog", "title": "Blog"},
+        {"name": "Portfolio", "href": "/portfolio.html", "title": "Projects, speeches and papers"}
+    ]
+}
