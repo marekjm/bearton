@@ -38,6 +38,14 @@ if str(ui) == 'get':
                 output = tmp
             for i in output:
                 msgr.message(i, 0)
+    elif '--key' in ui:
+        output = config.get(ui.get('-k'))
+        if '--json' in ui: output = json.dumps(output)
+        msgr.message(output, 0)
+    elif ui.arguments:
+        output = config.get(ui.arguments[0])
+        if '--json' in ui: output = json.dumps(output)
+        msgr.message(output, 0)
 elif str(ui) == 'set':
     key, value = '', ''
     if ui.arguments: key = ui.arguments.pop(0)
