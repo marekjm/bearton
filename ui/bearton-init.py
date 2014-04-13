@@ -28,6 +28,6 @@ if str(ui) == 'init':
         path = '.'
     path = os.path.abspath(path)
     schemes_path = (ui.get('-s') if '--schemes' in ui else SCHEMES_PATH)
-    msgr.message('generating Bearton local in {0}'.format(path), 0)
     if '--force' in ui: bearton.init.rm(path)
     bearton.init.new(where=path, schemes=schemes_path, msgr=msgr)
+    msgr.message('initialized Bearton local in {0}'.format(path), 0)
