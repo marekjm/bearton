@@ -34,7 +34,7 @@ if str(ui) == 'get':
         else:
             if '--verbose' in ui:
                 tmp = []
-                for k, v in output.items(): tmp.append('{0} = {1}'.format(k, v))
+                for k, v in output.items(): tmp.append('{0}={1}'.format(k, v))
                 output = tmp
             for i in output:
                 msgr.message(i, 0)
