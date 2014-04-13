@@ -28,12 +28,19 @@ def _newconf(where, msgr):
     util.writefile(config_path, '{}')
     if msgr is not None: msgr.message('written empty config file to {0}'.format(config_path), 1)
 
+def _copyschemes(where, schemes_path, msgr):
+    """Copy schemes to new Bearton local site repository.
+    """
+    msgr.debug('TODO: implement me!')
+    raise
+
 def new(where, schemes='', msgr=None):
     """Creates a new Bearton local repo.
     """
     if not os.path.isdir(where): raise NotADirectoryError(where)
     _newdirs(where, msgr)
     _newconf(where, msgr)
+    if schemes: _copyschemes(where, schemes, msgr)
 
 def rm(where, msgr=None):
     for part in ['assets', 'data']:

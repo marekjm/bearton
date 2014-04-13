@@ -15,7 +15,13 @@
             "short": "s",
             "long": "schemes",
             "arguments": ["str"],
+            "conflicts": ["--no-schemes"],
             "help": "set location of the schemes, they will be copied from there (overrides default)"
+        },
+        {
+            "short": "N",
+            "long": "no-schemes",
+            "help": "do not copy schemes"
         }
     ],
     "__global__": [
