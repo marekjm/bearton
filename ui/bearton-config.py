@@ -54,5 +54,13 @@ elif str(ui) == 'set':
     if '--value' in ui: value = ui.get('-v')
     msgr.debug('{0} -> {1}'.format(key, value))
     config.set(key, value)
+elif str(ui) == 'rm':
+    keys = []
+    if ui.arguments: keys = [k for k in ui.arguments]
+    if '--key' in ui: keys = [ui.get('-k')]
+    if '--pop' in ui:
+        msgr.message(config.pop(keys[0]), 0)
+    else:
+        for k in keys: config.remove(k)
 
 if str(ui) != '': config.store()
