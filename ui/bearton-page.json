@@ -48,6 +48,18 @@
             "help": "specify page id"
         }
     ],
+    "build": [
+        {
+            "short": "a",
+            "long": "all",
+            "help": "build all pages (a rebuilt of the site)"
+        },
+        {
+            "short": "n",
+            "long": "all-new",
+            "help": "build all new pages"
+        }
+    ],
     "__global__": [
         {
             "short": "v",

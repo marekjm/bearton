@@ -58,6 +58,10 @@ elif str(ui) == 'edit':
         msgr.message('fail: page id is required')
         exit(1)
     msgr.message('editing page {0}'.format(page_id))
+elif str(ui) == 'build':
+    pages = (os.listdir(SITE_DB_PATH) if '--all' in ui else [i for i in ui.arguments])
+    for page in pages:
+        msgr.message('building page: {0}'.format(page), 0)
 elif str(ui) == 'rm':
     page_id = ''
     if ui.arguments: page_id = ui.arguments[0]
