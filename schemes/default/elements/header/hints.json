@@ -1,0 +1,7 @@
+{
+    "slogan": {
+        "hint": "Enter your slogan, e.g. a short sentence, a catchy phrase or some quotation",
+        "type": "text",
+        "default: ""
+    }
+}
