@@ -4,20 +4,49 @@
             "short": "s",
             "long": "scheme",
             "arguments": ["str"],
-            "help": "set a scheme from which to take the element"
+            "help": "use given scheme to create the page"
+        },
+        {
+            "short": "S",
+            "long": "schemes-path",
+            "arguments": ["str"],
+            "help": "look for schemes in this path"
         },
         {
             "short": "e",
             "long": "element",
             "arguments": ["str"],
-            "help": "set a name of the element to take"
+            "help": "use given element to create the page"
+        },
+        {
+            "short": "E",
+            "long": "edit",
+            "help": "instantly launch editor after the page is created"
+        }
+    ],
+    "query": [
+        {
+            "short": "l",
+            "long": "list"
+        }
+    ],
+    "edit": [
+        {
+            "short": "p",
+            "long": "page-id",
+            "arguments": ["str"],
+            "required": true,
+            "help": "specify page id"
         }
     ],
     "rm": [
-    ],
-    "edit": [
-    ],
-    "query": [
+        {
+            "short": "p",
+            "long": "page-id",
+            "arguments": ["str"],
+            "required": true,
+            "help": "specify page id"
+        }
     ],
     "__global__": [
         {
@@ -39,6 +68,23 @@
             "short": "h",
             "long": "help",
             "help": "dispay help message"
+        },
+        {
+            "short": "w",
+            "long": "where",
+            "arguments": ["str"],
+            "help": "set different target directory"
+        },
+        {
+            "short": "W",
+            "long": "wipe-db",
+            "help": "wipe out the database",
+            "local": true
+        },
+        {
+            "short": "y",
+            "long": "yes",
+            "requires": ["--wipe-db"]
         }
     ]
 }
