@@ -61,3 +61,4 @@ They can only be required by other - buildable and unbuildable - elements.
 **`singular`**
 
 If set to true, only one such element can be created -- commands to create another such element will fail.
+Singular specifier has effects only on buildable elements because only they can create entries in database.
