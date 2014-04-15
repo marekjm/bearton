@@ -71,10 +71,10 @@ class Database:
     def query(self, scheme, element, queryd={}):
         subdb = {}
         for key, entry in self._db.items():
-            if scheme == entry['scheme'] and element == entry['name']: subdb[key] = entry
+            if scheme == entry._meta['scheme'] and element == entry._meta['name']: subdb[key] = entry
         pool = []
         for key, entry in subdb.items():
-            match = (True if queryd != {} else False)
+            match = True
             for k, v in queryd.items():
                 if k not in entry._meta:
                     match = False

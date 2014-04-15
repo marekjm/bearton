@@ -7,11 +7,11 @@ from .. import util
 from .. import config
 
 
-def new(path, schemes_path, scheme, element, msgr=None):
+def new(path, schemes_path, scheme, element, msgr=None, what='pages'):
     hashed = hashlib.sha256(base64.b64encode(os.urandom(64))).hexdigest()
     if msgr is not None: msgr.debug(hashed)
     if msgr is not None: msgr.debug('{0} {1}'.format(path, os.path.isdir(path)))
-    hashpath = os.path.join(path, '.bearton', 'db', hashed)
+    hashpath = os.path.join(path, '.bearton', 'db', what, hashed)
     msgr.debug('creating databse entry: {0}'.format(hashpath))
     os.mkdir(hashpath)
     files = ['meta', 'context', 'hints']

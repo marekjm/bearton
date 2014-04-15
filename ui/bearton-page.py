@@ -21,11 +21,13 @@ msgr = bearton.util.Messenger(verbosity=0, debugging=('--debug' in ui), quiet=('
 
 SITE_PATH = (ui.get('-w') if '--where' in ui else '.')
 SITE_DB_PATH = os.path.join(SITE_PATH, '.bearton', 'db')
-SCHEMES_PATH = (ui.get('-S') if '--schemes-path' in ui else '/usr/share/bearton/schemes')
+SCHEMES_PATH = (ui.get('-S') if '--schemes-path' in ui else os.path.join(SITE_PATH, '.bearton', 'schemes'))
 
 db = bearton.db.Database(path=SITE_PATH).load()
+config = bearton.config.Configuration(path=SITE_PATH).load()
 
 if str(ui) == 'new':
+    scheme = (config.get('scheme') if 'scheme' in config else 'default')
     scheme = (ui.arguments.pop(0) if len(ui.arguments) > 1 else 'default')
     element = (ui.arguments.pop(0) if ui.arguments else '')
 
@@ -41,13 +43,17 @@ if str(ui) == 'new':
     msgr.debug('using scheme: {0}'.format(scheme))
     msgr.debug('using element: {0}'.format(element))
     msgr.debug('target directory: {0}'.format(SITE_PATH))
-    element_meta = json.loads(bearton.util.readfile(os.path.join(SCHEMES_PATH, scheme, 'elements', element, 'meta.json')))
+    element_meta = os.path.join(SCHEMES_PATH, scheme, 'elements', element, 'meta.json')
+    if not os.path.isfile(element_meta):
+        msgr.message('fatal: cannot find metadata for element {0} in scheme {1}'.format(element, scheme))
+        exit(1)
+    element_meta = json.loads(bearton.util.readfile(element_meta))
     if 'singular' in element_meta:
-        if element_meta['singular'] and len(db.query({'scheme': scheme, 'name': element})) > 0:
+        if element_meta['singular'] and len(db.query(scheme, element)) > 0:
             msgr.message('failed to create element {0}: element is singular'.format(element), 0)
             exit(1)
-    hashed = bearton.page.page.new(path=SITE_PATH, schemes_path=SCHEMES_PATH, scheme='default', element='home', msgr=msgr)
-    entry = bearton.db.Entry(SITE_DB_PATH, hashed).load()
+    hashed = bearton.page.page.new(path=SITE_PATH, schemes_path=SCHEMES_PATH, scheme=scheme, element=element, msgr=msgr)
+    entry = bearton.db.Entry(os.path.join(SITE_DB_PATH, 'pages'), hashed).load()
     if 'scheme' not in entry._meta: entry.setinmeta('scheme', scheme)
     if 'name' not in entry._meta: entry.setinmeta('name', element)
     entry.store()
@@ -61,15 +67,15 @@ elif str(ui) == 'query':
             msgr.message(msg)
     else:
         queryd = {}
-        if '--scheme' in ui: queryd['scheme'] = ui.get('-s')
-        if '--element' in ui: queryd['name'] = ui.get('-e')
+        scheme = (ui.get('-s') if '--scheme' in ui else '')
+        element = (ui.get('-e') if '--element' in ui else '')
         for a in ui.arguments:
             if '=' not in a: continue
             a = a.split('=', 1)
             key, value = a[0], a[1]
             queryd[key] = value
-        msgr.debug('query: {0}'.format(queryd))
-        pool = db.query(queryd)
+        msgr.debug('query: scheme={0}, element={1}, queryd={2}'.format(scheme, element, queryd))
+        pool = db.query(scheme, element, queryd)
         for key, entry in pool:
             msgr.message(key, 0)
 elif str(ui) == 'edit':
