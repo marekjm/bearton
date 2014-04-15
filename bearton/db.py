@@ -43,7 +43,7 @@ class Database:
     """Object providing database interface.
     """
     def __init__(self, path):
-        self._path = os.path.join(path, '.bearton', 'db')
+        self._path = os.path.join(path, '.bearton', 'db', 'pages')
         self._db = None
 
     def __iter__(self):
