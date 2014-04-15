@@ -18,7 +18,8 @@ Ever-up-to-date list of keys can be found in source code of Bearton.
         "contexts": ["head", "header", "footer"]
     },
     "output": "index.html",
-    "singular": true
+    "singular": true,
+    "base": false
 }
 ```
 
@@ -31,9 +32,13 @@ Ever-up-to-date list of keys can be found in source code of Bearton.
 This is a dictionary containing various requirements of this element.
 Sub-keys of this dict are described here with preceding `requires.`.
 
+----
+
 **`requires.contexts`**
 
 This is a list of contexts the element requires to be correctly rendered.
+
+----
 
 **`output`**
 
@@ -55,8 +60,21 @@ Paths may contain:
 - hyphen, underscore and dot,
 
 Elements with empty `output` path are considered to be not buildable on their own, and thus
-cannot be created as a separate entries in database with `bearton page new` command.
-They can only be required by other - buildable and unbuildable - elements.
+cannot be created as a separate entries in pages database with `bearton page new` command.
+They can only be required by other - buildable and unbuildable - elements, or
+be added to databse as *base* elements.
+
+----
+
+**`base`**
+
+This specifier means that the file is a base file for the site and
+contains data that may be specific for each distribution of the scheme - e.g. menus, slogans, stylesheets etc.
+
+Such elements can be created with `bearton page new` command and are placed in a database directory separate from
+ordinary pages.
+
+----
 
 **`singular`**
 
