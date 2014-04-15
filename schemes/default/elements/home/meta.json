@@ -1,6 +1,6 @@
 {
     "requires": {
-        "contexts": []
+        "contexts": [],
         "base": ["head", "mainmenu", "header", "footer"]
     },
     "output": "/index.html",
