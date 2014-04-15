@@ -21,14 +21,11 @@ msgr = bearton.util.Messenger(verbosity=0, debugging=('--debug' in ui), quiet=('
 
 SITE_PATH = (ui.get('-w') if '--where' in ui else '.')
 SITE_DB_PATH = os.path.join(SITE_PATH, '.bearton', 'db')
+SCHEMES_PATH = (ui.get('-S') if '--schemes-path' in ui else '/usr/share/bearton/schemes')
 
 db = bearton.db.Database(path=SITE_PATH).load()
 
 if str(ui) == 'new':
-    SCHEMES_PATH = '/usr/share/bearton/schemes'
-
-    if '--schemes-path' in ui: SCHEMES_PATH = ui.get('-S')
-
     scheme = (ui.arguments.pop(0) if len(ui.arguments) > 1 else 'default')
     element = (ui.arguments.pop(0) if ui.arguments else '')
 
@@ -88,7 +85,7 @@ elif str(ui) == 'build':
     pages = (db.keys() if '--all' in ui else [i for i in ui.arguments])
     for page in pages:
         msgr.message('building page: {0}'.format(page), 0)
-        bearton.page.builder.build(path=SITE_PATH, page=page, msgr=msgr)
+        bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
 elif str(ui) == 'rm':
     page_id = ''
     if ui.arguments: page_id = ui.arguments[0]
