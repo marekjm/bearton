@@ -45,10 +45,13 @@ if str(ui) == 'new':
         msgr.message('fatal: cannot find metadata for element {0} in scheme {1}'.format(element, scheme))
         exit(1)
     element_meta = json.loads(bearton.util.readfile(element_meta))
-    if 'base' in element_meta:
-        if element_meta['base'] == True:
-            msgr.message('fatal: cannot add base element as a page', 0)
+    if '--base' in ui:
+        if element_meta['base'] == False or 'base' not in element_meta:
+            msgr.message('fatal: cannot add page as a base element', 0)
             exit(1)
+    if '--base' in ui and element in os.listdir(os.path.join(SITE_DB_PATH, 'base')):
+        msgr.message('fatal: base element \'{0}\' already created: try \'bearton page edit -bp {0}\' command'.format(element), 0)
+        exit(1)
     if 'singular' in element_meta:
         if element_meta['singular'] and len(db.query(scheme, element)) > 0:
             msgr.message('failed to create element {0}: element is singular'.format(element), 0)
@@ -61,7 +64,8 @@ if str(ui) == 'new':
     msgr.debug('target directory: {0}'.format(SITE_PATH))
 
     # Actual call creating new page in database
-    hashed = bearton.page.page.new(path=SITE_PATH, schemes_path=SCHEMES_PATH, scheme=scheme, element=element, msgr=msgr)
+    creator = (bearton.page.page.newbase if '--base' in ui else bearton.page.page.new)
+    hashed = creator(path=SITE_PATH, schemes_path=SCHEMES_PATH, scheme=scheme, element=element, msgr=msgr)
     # Editing?
     if '--edit' in ui: bearton.page.page.edit(path=SITE_PATH, page=hashed, msgr=msgr)
     # Final message
@@ -116,5 +120,8 @@ else:
         else:
             db.wipe()
             msgr.debug('wiped database contents from: {0}'.format(SITE_DB_PATH))
+    elif '--update-db' in ui:
+        db.update(SCHEMES_PATH)
+        msgr.message('metadata in database updated', 0)
 
 db.store().unload()

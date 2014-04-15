@@ -19,6 +19,11 @@
             "help": "use given element to create the page"
         },
         {
+            "short": "b",
+            "long": "base",
+            "help": "tells Bearton this is a base element that will be built"
+        },
+        {
             "short": "E",
             "long": "edit",
             "help": "instantly launch editor after the page is created"
@@ -49,6 +54,11 @@
             "arguments": ["str"],
             "required": true,
             "help": "specify page id"
+        },
+        {
+            "short": "b",
+            "long": "base",
+            "help": "tells Bearton it will be base element that needs editing"
         }
     ],
     "rm": [
@@ -109,6 +119,12 @@
             "short": "W",
             "long": "wipe-db",
             "help": "wipe out the database",
+            "local": true
+        },
+        {
+            "short": "U",
+            "long": "update-db",
+            "help": "updates metadata of entries in database with data read from (possibly) new scheme data",
             "local": true
         },
         {
