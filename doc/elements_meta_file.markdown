@@ -40,6 +40,13 @@ This is a list of contexts the element requires to be correctly rendered.
 
 ----
 
+**`requires.base`**
+
+This is a list of *base* contexts the element requires to be correctly rendered.
+Such contexts are first looked for in database.
+
+----
+
 **`output`**
 
 This is a file path, without preceding slash.
