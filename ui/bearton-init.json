@@ -1,10 +1,10 @@
 {
     "init": [
         {
-            "short": "w",
-            "long": "where",
+            "short": "t",
+            "long": "target",
             "arguments": ["str"],
-            "help": "set <where> directory, instead of default current working directory, as the target init-directory"
+            "help": "set target directory, instead of default current working directory, as the init-directory"
         },
         {
             "short": "f",
@@ -22,6 +22,14 @@
             "short": "N",
             "long": "no-schemes",
             "help": "do not copy schemes"
+        }
+    ],
+    "rm": [
+        {
+            "short": "t",
+            "long": "target",
+            "arguments": ["str"],
+            "help": "set target directory from which to rmeove Bearton repo"
         }
     ],
     "__global__": [
