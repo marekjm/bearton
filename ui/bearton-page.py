@@ -27,10 +27,10 @@ db = bearton.db.Database(path=SITE_PATH).load()
 config = bearton.config.Configuration(path=SITE_PATH).load()
 
 if str(ui) == 'new':
+    # Obtaining scheme and element
     scheme = (config.get('scheme') if 'scheme' in config else 'default')
     scheme = (ui.arguments.pop(0) if len(ui.arguments) > 1 else 'default')
     element = (ui.arguments.pop(0) if ui.arguments else '')
-
     if '--scheme' in ui: scheme = ui.get('-s')
     if '--element' in ui: element = ui.get('-e')
 
@@ -39,25 +39,32 @@ if str(ui) == 'new':
         msgr.message('fatal: element required', 0)
         exit(1)
 
-    msgr.debug('using scheme path: {0}'.format(SCHEMES_PATH))
-    msgr.debug('using scheme: {0}'.format(scheme))
-    msgr.debug('using element: {0}'.format(element))
-    msgr.debug('target directory: {0}'.format(SITE_PATH))
+    # Performing necessary checks
     element_meta = os.path.join(SCHEMES_PATH, scheme, 'elements', element, 'meta.json')
     if not os.path.isfile(element_meta):
         msgr.message('fatal: cannot find metadata for element {0} in scheme {1}'.format(element, scheme))
         exit(1)
     element_meta = json.loads(bearton.util.readfile(element_meta))
+    if 'base' in element_meta:
+        if element_meta['base'] == True:
+            msgr.message('fatal: cannot add base element as a page', 0)
+            exit(1)
     if 'singular' in element_meta:
         if element_meta['singular'] and len(db.query(scheme, element)) > 0:
             msgr.message('failed to create element {0}: element is singular'.format(element), 0)
             exit(1)
+
+    # Debugging info
+    msgr.debug('using scheme path: {0}'.format(SCHEMES_PATH))
+    msgr.debug('using scheme: {0}'.format(scheme))
+    msgr.debug('using element: {0}'.format(element))
+    msgr.debug('target directory: {0}'.format(SITE_PATH))
+
+    # Actual call creating new page in database
     hashed = bearton.page.page.new(path=SITE_PATH, schemes_path=SCHEMES_PATH, scheme=scheme, element=element, msgr=msgr)
-    entry = bearton.db.Entry(os.path.join(SITE_DB_PATH, 'pages'), hashed).load()
-    if 'scheme' not in entry._meta: entry.setinmeta('scheme', scheme)
-    if 'name' not in entry._meta: entry.setinmeta('name', element)
-    entry.store()
+    # Editing?
     if '--edit' in ui: bearton.page.page.edit(path=SITE_PATH, page=hashed, msgr=msgr)
+    # Final message
     msgr.message('created new page: {0}'.format(hashed), 0)
 elif str(ui) == 'query':
     if '--list' in ui:
