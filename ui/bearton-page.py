@@ -88,6 +88,7 @@ elif str(ui) == 'build':
     pages = (db.keys() if '--all' in ui else [i for i in ui.arguments])
     for page in pages:
         msgr.message('building page: {0}'.format(page), 0)
+        bearton.page.builder.build(path=SITE_PATH, page=page, msgr=msgr)
 elif str(ui) == 'rm':
     page_id = ''
     if ui.arguments: page_id = ui.arguments[0]

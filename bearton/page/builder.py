@@ -81,3 +81,10 @@ class Element:
         self._loadcontext(schemepath)
         self._loadtemplate(schemepath)
         return self
+
+
+def build(path, page, msgr):
+    msgr.debug('path: {0}'.format(path))
+    dbpath = os.path.join(path, '.bearton', 'db')
+    msgr.debug('dbpath: {0}'.format(dbpath))
+    msgr.debug('page: {0}'.format(page))
