@@ -19,18 +19,12 @@ ui.parse()
 
 msgr = bearton.util.Messenger(verbosity=0, debugging=('--debug' in ui))
 
-SCHEMES_PATH = (ui.get('-s') if '--schemes' in ui else '/usr/share/bearton/schemes')
+SITE_PATH = (ui.get('-t') if '--target' in ui else '.')
+SCHEMES_PATH = (ui.get('-s') if '--schemes' in ui else os.path.join(SITE_PATH, '.bearton', 'schemes'))
 
 if str(ui) == 'init':
-    if '--where' in ui:
-        path = ui.get('-w')
-    else:
-        path = '.'
-    path = os.path.abspath(path)
-    if '--no-schemes' in ui:
-        schemes_path = ''
-    else:
-        schemes_path = (ui.get('-s') if '--schemes' in ui else SCHEMES_PATH)
+    path = os.path.abspath(SITE_PATH)
+    schemes_path = ('' if '--no-schemes' in ui else SCHEMES_PATH)
     if '--force' in ui: bearton.init.rm(path, msgr)
     bearton.init.new(target=path, schemes=schemes_path, msgr=msgr)
     msgr.message('initialized Bearton local in {0}'.format(path), 0)
