@@ -3,8 +3,8 @@ import hashlib
 import os
 import shutil
 
-from . import util
-from . import config
+from .. import util
+from .. import config
 
 
 def new(path, schemes_path, scheme, element, msgr=None):
