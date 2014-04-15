@@ -29,6 +29,19 @@ def new(path, schemes_path, scheme, element, msgr=None):
     entry.store()
     return hashed
 
+def newbase(path, schemes_path, scheme, element, msgr=None):
+    if msgr is not None: msgr.debug('{0} {1}'.format(path, os.path.isdir(path)))
+    basepath = os.path.join(path, '.bearton', 'db', 'base', element)
+    os.mkdir(basepath)
+    files = ['meta', 'context', 'hints']
+    element_path = os.path.join(schemes_path, scheme, 'elements', element)
+    for f in files:
+        f += '.json'
+        msgr.debug('copying {0}'.format(f), keep=True)
+        msgr.onok(msg='\tOK').onfail(msg='\tFAIL: {:error_msg}')
+        msgr.call(shutil.copy, os.path.join(element_path, f), os.path.join(basepath, f))
+        msgr.report()
+
 def edit(path, page, msgr=None):
     msgr.debug('editing in: {0}'.format(path))
     path = os.path.join(path, '.bearton', 'db')
