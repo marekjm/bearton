@@ -24,6 +24,13 @@ class Entry:
         self._context = json.loads(util.readfile(os.path.join(epath, 'context.json')))
         return self
 
+    def update(self, schemes):
+        new_meta = json.loads(util.readfile(os.path.join(schemes, self._meta['scheme'], 'elements', self._meta['name'], 'meta.json')))
+        if self._meta != new_meta:
+            self._meta = new_meta
+            self._changed = True
+        return self
+
     def setinmeta(self, key, value=''):
         self._meta[key] = value
         self._changed = True
@@ -44,6 +51,7 @@ class Database:
     """
     def __init__(self, path):
         self._path = os.path.join(path, '.bearton', 'db', 'pages')
+        self._rawpath = path
         self._db = None
 
     def __iter__(self):
@@ -88,3 +96,6 @@ class Database:
     def wipe(self):
         for entry in self: entry.remove()
         self._readdb()
+
+    def update(self, schemes=''):
+        if not schemes: schemes = os.path.join(self._rawpath, 'schemes')
