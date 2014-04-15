@@ -1,6 +1,5 @@
 import json
 import os
-import shutil
 from sys import argv
 
 import clap
@@ -23,6 +22,8 @@ msgr = bearton.util.Messenger(verbosity=0, debugging=('--debug' in ui), quiet=('
 SITE_PATH = (ui.get('-w') if '--where' in ui else '.')
 SITE_DB_PATH = os.path.join(SITE_PATH, '.bearton', 'db')
 
+db = bearton.db.Database(path=SITE_PATH).load()
+
 if str(ui) == 'new':
     SCHEMES_PATH = '/usr/share/bearton/schemes'
 
@@ -43,13 +44,37 @@ if str(ui) == 'new':
     msgr.debug('using scheme: {0}'.format(scheme))
     msgr.debug('using element: {0}'.format(element))
     msgr.debug('target directory: {0}'.format(SITE_PATH))
-    hashed = bearton.page.new(path=SITE_PATH, schemes_path=SCHEMES_PATH, scheme='default', element='home', msgr=msgr)
-    if '--edit' in ui: bearton.page.edit(path=SITE_PATH, page=hashed, msgr=msgr)
+    element_meta = json.loads(bearton.util.readfile(os.path.join(SCHEMES_PATH, scheme, 'elements', element, 'meta.json')))
+    if 'singular' in element_meta:
+        if element_meta['singular'] and len(db.query({'scheme': scheme, 'name': element})) > 0:
+            msgr.message('failed to create element {0}: element is singular'.format(element), 0)
+            exit(1)
+    hashed = bearton.page.page.new(path=SITE_PATH, schemes_path=SCHEMES_PATH, scheme='default', element='home', msgr=msgr)
+    entry = bearton.db.Entry(SITE_DB_PATH, hashed).load()
+    if 'scheme' not in entry._meta: entry.setinmeta('scheme', scheme)
+    if 'name' not in entry._meta: entry.setinmeta('name', element)
+    entry.store()
+    if '--edit' in ui: bearton.page.page.edit(path=SITE_PATH, page=hashed, msgr=msgr)
     msgr.message('created new page: {0}'.format(hashed), 0)
 elif str(ui) == 'query':
     if '--list' in ui:
-        pages = os.listdir(SITE_DB_PATH)
-        for i in pages: msgr.message(i)
+        pages = db.keys()
+        for i in pages:
+            msg = i
+            msgr.message(msg)
+    else:
+        queryd = {}
+        if '--scheme' in ui: queryd['scheme'] = ui.get('-s')
+        if '--element' in ui: queryd['name'] = ui.get('-e')
+        for a in ui.arguments:
+            if '=' not in a: continue
+            a = a.split('=', 1)
+            key, value = a[0], a[1]
+            queryd[key] = value
+        msgr.debug('query: {0}'.format(queryd))
+        pool = db.query(queryd)
+        for key, entry in pool:
+            msgr.message(key, 0)
 elif str(ui) == 'edit':
     page_id = ''
     if ui.arguments: page_id = ui.arguments[0]
@@ -59,7 +84,8 @@ elif str(ui) == 'edit':
         exit(1)
     msgr.message('editing page {0}'.format(page_id))
 elif str(ui) == 'build':
-    pages = (os.listdir(SITE_DB_PATH) if '--all' in ui else [i for i in ui.arguments])
+    db = bearton.db.Database(path=SITE_PATH).load()
+    pages = (db.keys() if '--all' in ui else [i for i in ui.arguments])
     for page in pages:
         msgr.message('building page: {0}'.format(page), 0)
 elif str(ui) == 'rm':
@@ -77,6 +103,7 @@ else:
         if not really:
             msgr.debug('cancelled database wipeout')
         else:
-            shutil.rmtree(SITE_DB_PATH)
+            db.wipe()
             msgr.debug('wiped database contents from: {0}'.format(SITE_DB_PATH))
-            os.mkdir(SITE_DB_PATH)
+
+db.store().unload()

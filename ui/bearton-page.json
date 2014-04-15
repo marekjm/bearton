@@ -28,6 +28,18 @@
         {
             "short": "l",
             "long": "list"
+        },
+        {
+            "short": "s",
+            "long": "scheme",
+            "arguments": ["str"],
+            "help": "set scheme to query"
+        },
+        {
+            "short": "e",
+            "long": "element",
+            "arguments": ["str"],
+            "help": "set element to query"
         }
     ],
     "edit": [
