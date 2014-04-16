@@ -56,9 +56,9 @@ The path in meta may be formatted using following strings, using `{{foo}}` synta
 
 - `year`: expands to year,
 - `month`: expands to month of the year,
-- `month_day`: expands to day of the month,
+- `mday`: expands to day of the month,
+- `yday`: expands to day of the year,
 - `epoch`: expands to number of seconds from epoch,
-- `random:N`: expands to `N` random charaters from the set of valid characters for paths, except for directory separator (e.g. `/` on Linux),
 
 Paths may contain:
 
