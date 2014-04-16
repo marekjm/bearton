@@ -1,12 +1,6 @@
 {
     "init": [
         {
-            "short": "t",
-            "long": "target",
-            "arguments": ["str"],
-            "help": "set target directory, instead of default current working directory, as the init-directory"
-        },
-        {
             "short": "f",
             "long": "force",
             "help": "write even if directories are already present (e.g. when reinitializing)"
@@ -25,11 +19,18 @@
         }
     ],
     "rm": [
+    ],
+    "sync": [
         {
-            "short": "t",
-            "long": "target",
+            "short": "s",
+            "long": "schemes",
             "arguments": ["str"],
-            "help": "set target directory from which to rmeove Bearton repo"
+            "help": "sync schemes, copy new versions from this directory"
+        },
+        {
+            "short": "a",
+            "long": "all",
+            "help": "copy all schemes"
         }
     ],
     "__global__": [
@@ -52,6 +53,12 @@
             "short": "h",
             "long": "help",
             "help": "dispay help message"
+        },
+        {
+            "short": "t",
+            "long": "target",
+            "arguments": ["str"],
+            "help": "set target directory"
         }
     ]
 }
