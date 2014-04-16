@@ -3,6 +3,6 @@
         "contexts": [],
         "base": ["head", "mainmenu", "header", "footer"]
     },
-    "output": "/index.html",
+    "output": "index.html",
     "singular": true
 }
