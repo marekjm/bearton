@@ -57,3 +57,13 @@ def rm(target, msgr):
     if os.path.isdir(path):
         shutil.rmtree(path)
         msgr.message('removed Bearton local from {0}'.format(path), 1)
+
+def syncschemes(target, schemes, wanted, msgr):
+    for w in wanted:
+        targetpath = os.path.join(target, w)
+        sourcepath = os.path.join(schemes, w)
+        if os.path.isdir(targetpath):
+            msgr.debug('removing scheme "{0}" from {1}'.format(w, target))
+            shutil.rmtree(targetpath)
+        msgr.debug('copying scheme "{0}" from {1}'.format(w, schemes))
+        shutil.copytree(sourcepath, targetpath)
