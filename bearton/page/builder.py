@@ -22,7 +22,7 @@ def gathercontexts(schemes, scheme, contexts, msgr):
     msgr.debug('final required contexts: {0}'.format(contexts))
     return gathered
 
-def loadcontexts(schemes, scheme, context, required):
+def loadcontexts(schemes, scheme, context, required, msgr):
     for element in required:
         cntxt = json.loads(util.readfile(os.path.join(schemes, scheme, 'elements', element, 'context.json')))
         for k, v in cntxt.items():
@@ -30,8 +30,20 @@ def loadcontexts(schemes, scheme, context, required):
             context[k] = v
     return context
 
+def loadbasecontexts(path, schemes, scheme, context, required, msgr):
+    for element in required:
+        conpath = os.path.join(path, '.bearton', 'db', 'base', element, 'context.json')
+        if not os.path.isfile(conpath):
+            msgr.debug('warning: loading default context for base element: {0}'.format(element))
+            conpath = os.path.join(schemes, scheme, 'elements', element, 'context.json')
+        cntxt = json.loads(util.readfile(conpath))
+        for k, v in cntxt.items():
+            if k in context: msgr.message('warning: key conflict in context: {0}: {1} -> {2}'.format(k, context[k], v))
+            context[k] = v
+    return context
+
 def build(path, schemes, page, msgr):
-    dbpath = os.path.join(path, '.bearton', 'db')
+    dbpath = os.path.join(path, '.bearton', 'db', 'pages')
     pagepath = os.path.join(dbpath, page)
     msgr.debug('schemes: {0}'.format(schemes))
     msgr.debug('path: {0}'.format(path))
@@ -41,12 +53,14 @@ def build(path, schemes, page, msgr):
     msgr.debug('meta: {0}'.format(meta))
     context = json.loads(util.readfile(os.path.join(pagepath, 'context.json')))
     gathered = gathercontexts(schemes, meta['scheme'], meta['requires']['contexts'], msgr)
+    gathered_base = gathercontexts(schemes, meta['scheme'], meta['requires']['base'], msgr)
     msgr.debug('context: {0}'.format(context))
-    context = loadcontexts(schemes, meta['scheme'], context, gathered)
+    context = loadcontexts(schemes, meta['scheme'], context, gathered, msgr)
+    context = loadbasecontexts(path, schemes, meta['scheme'], context, gathered_base, msgr)
     msgr.debug('final context: {0}'.format(context))
     msgr.debug('reading template')
     template = util.readfile(os.path.join(schemes, meta['scheme'], 'elements', meta['name'], 'template.mustache'))
-    rendered = ''
     rendered = muspyche.make(template, context, lookup=[os.path.join(schemes, meta['scheme'], 'elements')])
-    msgr.message('\n')
-    msgr.message(rendered, 0)
+    output = os.path.join(path, util.expandoutput(meta['output']))
+    msgr.debug('written file to: {0}'.format(output))
+    util.writefile(output, rendered)
