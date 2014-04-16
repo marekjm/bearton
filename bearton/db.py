@@ -26,9 +26,13 @@ class Entry:
 
     def update(self, schemes):
         new_meta = json.loads(util.readfile(os.path.join(schemes, self._meta['scheme'], 'elements', self._meta['name'], 'meta.json')))
-        if self._meta != new_meta:
-            self._meta = new_meta
-            self._changed = True
+        for key, value in new_meta.items():
+            if key not in self._meta:
+                self._meta[key] = value
+                self._changed = True
+            if self._meta[key] != value:
+                self._meta[key] = value
+                self._changed = True
         return self
 
     def setinmeta(self, key, value=''):
@@ -38,6 +42,7 @@ class Entry:
     def store(self):
         epath = os.path.join(self._path, self._entry)
         if self._changed:
+            print('stored:', self._path)
             util.writefile(os.path.join(epath, 'meta.json'), json.dumps(self._meta))
             util.writefile(os.path.join(epath, 'context.json'), json.dumps(self._context))
         self._changed = False
@@ -99,3 +104,4 @@ class Database:
 
     def update(self, schemes=''):
         if not schemes: schemes = os.path.join(self._rawpath, 'schemes')
+        for entry in self: entry.update(schemes)
