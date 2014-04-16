@@ -24,16 +24,31 @@ class Entry:
         self._context = json.loads(util.readfile(os.path.join(epath, 'context.json')))
         return self
 
-    def update(self, schemes):
+    def _updatemeta(self, schemes):
         new_meta = json.loads(util.readfile(os.path.join(schemes, self._meta['scheme'], 'elements', self._meta['name'], 'meta.json')))
-        for key, value in new_meta.items():
-            if key not in self._meta:
-                self._meta[key] = value
-                self._changed = True
-            if self._meta[key] != value:
-                self._meta[key] = value
-                self._changed = True
-        return self
+        scheme, name = self._meta['scheme'], self._meta['name']
+        final = util.dictmerge(self._meta, new_meta)
+        for k, v in [('scheme', scheme), ('name', name)]:
+            if k not in final: final[k] = v
+        code = 0
+        if final != self._meta:
+            self._meta = final
+            code = 1
+            self._changed = True
+        return code
+
+    def update(self, schemes):
+        """Return codes:
+
+        0 - nothing was updated,
+        1 - metadata was updated,
+        2 - context was updated,
+        3 - metadata and context were updated,
+        """
+        code = 0
+        code += self._updatemeta(schemes)
+        new_context = json.loads(util.readfile(os.path.join(schemes, self._meta['scheme'], 'elements', self._meta['name'], 'context.json')))
+        return code
 
     def setinmeta(self, key, value=''):
         self._meta[key] = value
@@ -42,7 +57,6 @@ class Entry:
     def store(self):
         epath = os.path.join(self._path, self._entry)
         if self._changed:
-            print('stored:', self._path)
             util.writefile(os.path.join(epath, 'meta.json'), json.dumps(self._meta))
             util.writefile(os.path.join(epath, 'context.json'), json.dumps(self._context))
         self._changed = False
@@ -103,5 +117,17 @@ class Database:
         self._readdb()
 
     def update(self, schemes=''):
+        """Updates entries in database.
+        Return value is a tuple: (metadata, contexts) where
+
+        * `metadata` is a list of entries whose metadata was updated,
+        * `contexts` is a list of entries whose context was updated,
+        """
         if not schemes: schemes = os.path.join(self._rawpath, 'schemes')
-        for entry in self: entry.update(schemes)
+        metadata, contexts = [], []
+        for entry in self:
+            ret_code = entry.update(schemes)
+            if ret_code == 0: pass
+            elif ret_code in [1, 3] and entry._entry not in metadata: metadata.append(entry._entry)
+            elif ret_code in [2, 3] and entry._entry not in contexts: contexts.append(entry._entry)
+        return (metadata, contexts)

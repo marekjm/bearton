@@ -94,3 +94,43 @@ def expandoutput(s):
     for key, value in context.items():
         s = s.replace(('{{'+key+'}}'), str(value))
     return s
+
+def dictsimilarise(base, update):
+    """Copies keys missing in base but present in update to base dictionary.
+    Does not overwrite or update any value already present in base.
+
+    Raises TypeError when the same key has different type in base and update dicts.
+    """
+    new = {}
+    for k, v in base.items(): new[k] = v
+    for key in update:
+        if key in base:
+            if type(base[key]) != type(update[key]):
+                raise TypeError('different types for key: {0}'.format(key))
+        if key not in base:
+            if type(base[key]) == dict:
+                value = dictsimilarise(base[key], update[key])
+            else:
+                value = update[key]
+            new[key] = value
+    return new
+
+def dictupdate(base, update, removals=True):
+    """Updates all values present in base with values present in update.
+    If `removals` is true, removes all kes that are not prsent in update.
+    Else, leaves them as they were.
+    """
+    new = {}
+    for key in base:
+        if key in update: new[key] = update[key]
+        elif key not in update and not removals: new[key] = base[key]
+    return new
+
+def dictmerge(base, update):
+    """First similarises and then updates (with removals) ase dict with update dict.
+    """
+    #print('base:', base)
+    #print('update:', update)
+    new = dictupdate(dictsimilarise(base, update), update)
+    #print('new:', new)
+    return new
