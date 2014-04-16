@@ -3,6 +3,7 @@
 
 
 import sys
+import time
 
 
 class Messenger:
@@ -80,3 +81,16 @@ def writefile(path, s, encoding='utf-8'):
     ofstream = open(path, 'wb')
     if encoding is not None: s = s.encode(encoding)
     ofstream.write(s)
+
+def expandoutput(s):
+    epoch = time.time()
+    struct_tm = time.gmtime(epoch)
+    context = {'year': struct_tm.tm_year,
+               'month': struct_tm.tm_mon,
+               'mday': struct_tm.tm_mday,
+               'yday': struct_tm.tm_yday,
+               'epoch': epoch,
+               }
+    for key, value in context.items():
+        s = s.replace(('{{'+key+'}}'), str(value))
+    return s
