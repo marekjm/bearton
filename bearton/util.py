@@ -2,6 +2,7 @@
 """
 
 
+import os
 import sys
 import time
 
@@ -144,3 +145,29 @@ def dictmerge(base, update, **kwargs):
     """
     new = dictupdate(base=dictsimilarise(base, update), update=update, **kwargs)
     return new
+
+
+def getschemespath(cwd='.'):
+    path = ''
+    paths = [(cwd, '.bearton', 'schemes'),
+             (os.path.expanduser('~'), '.local', 'share', 'bearton', 'schemes'),
+             ('/', 'usr', 'share', 'bearton', 'schemes'),
+    ]
+    for p in paths:
+        if os.path.isdir(os.path.join(*p)):
+            path = os.path.join(*p)
+            break
+    return path
+
+def getuipath(cwd=''):
+    path = ''
+    paths = [(os.path.expanduser('~'), '.local', 'share', 'bearton', 'ui'),
+             ('/', 'usr', 'share', 'bearton', 'ui'),
+             (cwd, 'ui'),
+    ]
+    if cwd: paths.insert(0, paths.pop(-1))
+    for p in paths:
+        if os.path.isdir(os.path.join(*p)):
+            path = os.path.join(*p)
+            break
+    return path
