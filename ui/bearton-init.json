@@ -6,7 +6,7 @@
             "help": "write even if directories are already present (e.g. when reinitializing)"
         },
         {
-            "short": "s",
+            "short": "S",
             "long": "schemes",
             "arguments": ["str"],
             "conflicts": ["--no-schemes"],

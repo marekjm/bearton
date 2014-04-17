@@ -26,19 +26,23 @@ ui.parse()
 # Setting constants for later use
 SITE_PATH = (ui.get('-t') if '--target' in ui else '.')
 SITE_DB_PATH = os.path.join(SITE_PATH, '.bearton', 'db')
-SCHEMES_PATH = (ui.get('-S') if '--schemes-path' in ui else bearton.util.getschemespath(cwd=SITE_PATH))
+SCHEMES_PATH = (ui.get('-S') if '--schemes' in ui else bearton.util.getschemespath(cwd=SITE_PATH))
 
 
 # Creating widely used objects
 msgr = bearton.util.Messenger(verbosity=0, debugging=('--debug' in ui), quiet=('--quiet' in ui))
-db = bearton.db.Database(path=SITE_PATH).load()
-config = bearton.config.Configuration(path=SITE_PATH).load()
+db = bearton.db.Database(path=SITE_PATH)
+config = bearton.config.Configuration(path=SITE_PATH)
 
 
 if str(ui) == 'init':
     path = os.path.abspath(SITE_PATH)
-    if '--force' in ui: bearton.init.rm(path, msgr)
+    if '--force' in ui:
+        msgr.debug('forcing initialization')
+        bearton.init.rm(path, msgr)
     bearton.init.new(target=path, schemes=SCHEMES_PATH, msgr=msgr)
+    db.load()
+    config.load()
     msgr.message('initialized Bearton local in {0}'.format(path), 0)
 elif str(ui) == 'rm':
     target = (ui.get('-t') if '--target' in ui else '.')
@@ -48,6 +52,7 @@ elif str(ui) == 'rm':
         msgr.debug('removed Bearton repository from {0}'.format(target))
     else:
         msgr.debug('no Bearton repository found in {0}'.format(target))
+    exit() # to prevent config and db from being stored
 elif str(ui) == 'sync':
     print('ui mode:', ui.mode)
     print('ui arguments:', ui.arguments)
