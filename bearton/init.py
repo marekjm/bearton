@@ -9,7 +9,7 @@ from . import util
 from . import config
 
 
-def _newdirs(target, msgr=None):
+def _newdirs(target, msgr):
     """Create require directories.
     """
     dirs = [('.bearton',),
@@ -23,19 +23,18 @@ def _newdirs(target, msgr=None):
     for parts in dirs:
         path = os.path.join(target, *parts)
         os.mkdir(path)
-        if msgr is not None: msgr.message('creating: {0}'.format(path), 2)
+        msgr.debug('creating: {0}'.format(path), 2)
 
 def _newconf(target, msgr):
     """Create empty config file.
     """
-    config = config.Configuration(os.path.join(target, '.bearton')).load().default().store().unload()
-    msgr.message('written default config file to {0}'.format(config_path), 1)
+    config.Configuration(os.path.join(target, '.bearton', 'config.json')).default().store().unload()
+    msgr.debug('written default config file to {0}'.format(os.path.join(target, '.bearton')))
 
 def _copyschemes(target, schemes_path, msgr):
     """Copy schemes to new Bearton local site repository.
     """
-    msgr.message('target: {0}'.format(target))
-    msgr.message('schemes: {0}'.format(schemes_path))
+    msgr.debug('schemes are copied from: {0}'.format(schemes_path))
     for scheme in os.listdir(schemes_path): shutil.copytree(os.path.join(schemes_path, scheme), os.path.join(target, '.bearton', 'schemes', scheme))
 
 def new(target, schemes='', msgr=None):
@@ -51,18 +50,19 @@ def rm(target, msgr):
         path = os.path.join(target, part)
         if os.path.isdir(path):
             shutil.rmtree(path)
-            msgr.message('removed: {0}'.format(path), 2)
+            msgr.debug('removed: {0}'.format(path))
     path = os.path.join(target, '.bearton')
+    msgr.debug('possible Bearton repo in: {0} ({1})'.format(path, os.path.isdir(path)))
     if os.path.isdir(path):
         shutil.rmtree(path)
-        msgr.message('removed Bearton local from {0}'.format(path), 1)
+        msgr.message('removed Bearton local from {0}'.format(path), 0)
 
 def syncschemes(target, schemes, wanted, msgr):
     for w in wanted:
         targetpath = os.path.join(target, w)
         sourcepath = os.path.join(schemes, w)
         if os.path.isdir(targetpath):
-            msgr.debug('removing scheme "{0}" from {1}'.format(w, target))
+            msgr.message('removing scheme "{0}" from {1}'.format(w, target), 1)
             shutil.rmtree(targetpath)
-        msgr.debug('copying scheme "{0}" from {1}'.format(w, schemes))
+        msgr.message('copying scheme "{0}" from {1}'.format(w, schemes), 1)
         shutil.copytree(sourcepath, targetpath)
