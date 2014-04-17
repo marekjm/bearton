@@ -23,7 +23,7 @@ def _newdirs(target, msgr):
     for parts in dirs:
         path = os.path.join(target, *parts)
         os.mkdir(path)
-        msgr.debug('creating: {0}'.format(path), 2)
+        msgr.debug('creating: {0}'.format(path))
 
 def _newconf(target, msgr):
     """Create empty config file.
