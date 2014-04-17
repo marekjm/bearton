@@ -23,11 +23,10 @@ ui.check()
 ui.parse()
 
 
-
 # Setting constants for later use
 SITE_PATH = (ui.get('-t') if '--target' in ui else '.')
 SITE_DB_PATH = os.path.join(SITE_PATH, '.bearton', 'db')
-SCHEMES_PATH = (ui.get('-S') if '--schemes-path' in ui else os.path.join(SITE_PATH, '.bearton', 'schemes'))
+SCHEMES_PATH = (ui.get('-S') if '--schemes-path' in ui else bearton.util.getschemespath(cwd=SITE_PATH))
 
 
 # Creating widely used objects
