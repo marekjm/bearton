@@ -7,7 +7,7 @@ import time
 
 
 class Messenger:
-    """Object used to display messages, i.e. print them to console.
+    """Object used to write messages to stream-like objects.
     """
     def __init__(self, verbosity=0, quiet=False, debugging=False, stream=sys.stdout):
         self._stream = stream
@@ -15,6 +15,13 @@ class Messenger:
         self._quiet, self._debugging = quiet, debugging
         self._line, self._lineend = '', '\n'
         self._on = {}
+        err = None
+        try:
+            stream.write
+        except Exception as e:
+            err = e
+        finally:
+            if err is not None: raise TypeError('"{0}" is not a valid stream type for Messenger: caused by {1}'.format(str(type(stream))[8:-2], str(type(err))[8:-2]))
 
     def _send(self, line, keep=False):
         self._line += line
@@ -74,13 +81,13 @@ def readfile(path, encoding='utf-8'):
     if encoding is not None: s = s.decode(encoding)
     return s
 
-
 def writefile(path, s, encoding='utf-8'):
     """Writes a file.
     """
     ofstream = open(path, 'wb')
     if encoding is not None: s = s.encode(encoding)
     ofstream.write(s)
+
 
 def expandoutput(s):
     epoch = time.time()
@@ -95,6 +102,7 @@ def expandoutput(s):
         s = s.replace(('{{'+key+'}}'), str(value))
     return s
 
+
 def dictsimilarise(base, update):
     """Copies keys missing in base but present in update to base dictionary.
     Does not overwrite or update any value already present in base.
@@ -107,30 +115,32 @@ def dictsimilarise(base, update):
         if key in base:
             if type(base[key]) != type(update[key]):
                 raise TypeError('different types for key: {0}'.format(key))
-        if key not in base:
             if type(base[key]) == dict:
-                value = dictsimilarise(base[key], update[key])
-            else:
-                value = update[key]
-            new[key] = value
+                new[key] = dictsimilarise(base[key], update[key])
+        else:
+            new[key] = update[key]
     return new
 
-def dictupdate(base, update, removals=True):
+def dictupdate(base, update, overwrites=True, removals=True):
     """Updates all values present in base with values present in update.
-    If `removals` is true, removes all kes that are not prsent in update.
+    If `removals` is true, removes all keys that are not present in update.
     Else, leaves them as they were.
     """
     new = {}
     for key in base:
-        if key in update: new[key] = update[key]
-        elif key not in update and not removals: new[key] = base[key]
+        if key in update:
+            if overwrites:
+                if type(base[key]) == dict and type(update[key]) == dict: value = dictupdate(base[key], update[key], overwrites, removals)
+                else: value = update[key]
+            else: value = base[key]
+            new[key] = value
+        if key not in update and not removals:
+            new[key] = base[key]
     return new
 
-def dictmerge(base, update):
-    """First similarises and then updates (with removals) ase dict with update dict.
+def dictmerge(base, update, **kwargs):
+    """First similarises and then updates base dict with update dict.
+    kwargs are passed to dictupdate() function and are not directly used by dictmerge.
     """
-    #print('base:', base)
-    #print('update:', update)
-    new = dictupdate(dictsimilarise(base, update), update)
-    #print('new:', new)
+    new = dictupdate(base=dictsimilarise(base, update), update=update, **kwargs)
     return new
