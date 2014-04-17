@@ -25,7 +25,7 @@
             "help": "set value of key"
         },
         {
-            "short": "v",
+            "short": "V",
             "long": "value",
             "arguments": ["str"],
             "requires": ["--key"],
