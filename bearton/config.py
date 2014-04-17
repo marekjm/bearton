@@ -64,6 +64,7 @@ class Configuration:
         """Return configuration to default state.
         """
         self._conf = {'scheme': 'default'}
+        return self
 
     def store(self):
         """Stores configration file and
