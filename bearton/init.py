@@ -6,6 +6,7 @@ import os
 import shutil
 
 from . import util
+from . import config
 
 
 def _newdirs(target, msgr=None):
@@ -27,10 +28,8 @@ def _newdirs(target, msgr=None):
 def _newconf(target, msgr):
     """Create empty config file.
     """
-    config_path = os.path.join(target, '.bearton', 'config.json')
-    config = {'scheme': 'default'}
-    util.writefile(config_path, json.dumps(config))
-    if msgr is not None: msgr.message('written default config file to {0}'.format(config_path), 1)
+    config = config.Configuration(os.path.join(target, '.bearton')).load().default().store().unload()
+    msgr.message('written default config file to {0}'.format(config_path), 1)
 
 def _copyschemes(target, schemes_path, msgr):
     """Copy schemes to new Bearton local site repository.
