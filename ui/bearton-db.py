@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import json
 import os
 from sys import argv
@@ -11,7 +13,9 @@ import bearton
 args = clap.formater.Formater(argv[1:])
 args.format()
 
-builder = clap.builder.Builder('{0}.json'.format(os.path.splitext(__file__)[0]), argv=list(args))
+_file = os.path.splitext(os.path.split(__file__)[-1])[0]
+uipath = os.path.join(bearton.util.getuipath(), '{0}.json'.format(_file))
+builder = clap.builder.Builder(uipath, argv=list(args))
 builder.build()
 
 ui = builder.get()
