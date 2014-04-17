@@ -37,6 +37,17 @@ class Entry:
             self._changed = True
         return code
 
+    def _updatecontext(self, schemes):
+        new = json.loads(util.readfile(os.path.join(schemes, self._meta['scheme'], 'elements', self._meta['name'], 'context.json')))
+        code = 0
+        final = util.dictmerge(base=self._context, update=new, overwrites=False)
+        code = 0
+        if final != self._context:
+            self._context = final
+            code = 2
+            self._changed = True
+        return code
+
     def update(self, schemes):
         """Return codes:
 
@@ -47,7 +58,7 @@ class Entry:
         """
         code = 0
         code += self._updatemeta(schemes)
-        new_context = json.loads(util.readfile(os.path.join(schemes, self._meta['scheme'], 'elements', self._meta['name'], 'context.json')))
+        code += self._updatecontext(schemes)
         return code
 
     def setinmeta(self, key, value=''):
@@ -128,6 +139,6 @@ class Database:
         for entry in self:
             ret_code = entry.update(schemes)
             if ret_code == 0: pass
-            elif ret_code in [1, 3] and entry._entry not in metadata: metadata.append(entry._entry)
-            elif ret_code in [2, 3] and entry._entry not in contexts: contexts.append(entry._entry)
+            if ret_code in [1, 3] and entry._entry not in metadata: metadata.append(entry._entry)
+            if ret_code in [2, 3] and entry._entry not in contexts: contexts.append(entry._entry)
         return (metadata, contexts)
