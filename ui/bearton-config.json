@@ -68,10 +68,10 @@
             "help": "dispay help message"
         },
         {
-            "short": "w",
-            "long": "where",
+            "short": "t",
+            "long": "target",
             "arguments": ["str"],
-            "help": "set different target directory"
+            "help": "set target directory"
         }
     ]
 }
