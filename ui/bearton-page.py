@@ -98,7 +98,6 @@ elif str(ui) == 'edit':
         exit(1)
     msgr.message('editing page {0}'.format(page_id))
 elif str(ui) == 'build':
-    db = bearton.db.Database(path=SITE_PATH).load()
     pages = (db.keys() if '--all' in ui else [i for i in ui.arguments])
     for page in pages:
         msgr.message('building page: {0}'.format(page), 0)
@@ -122,11 +121,12 @@ else:
             msgr.debug('wiped database contents from: {0}'.format(SITE_DB_PATH))
     elif '--update-db' in ui:
         metadata, contexts = db.update(SCHEMES_PATH)
-        if metadata: msgr.message('metadata in database updated in {0} element(s)'.format(len(metadata)), 0)
+        for name, value in [('metadata', metadata), ('context', contexts)]:
+            if value: msgr.message('number of db entries with update to: {0}: {0}'.format(name, len(value)), 0)
         if contexts:
-            msgr.message('contexts in database updated in {0} element(s)'.format(len(metadata)), 0)
             log = os.path.join('.', 'bearton.required_context_edits.log')
-            util.writefile(log, '\n'.join(contents))
-            msgr.message('entries that require context edits were placed in {0} file'.format(len(log)), 0)
+            if '--context-edits-log' in ui: log = ui.get('--context-edits-log')
+            bearton.util.writefile(log, '\n'.join(contexts))
+            msgr.message('entries that possibly - in case something was added - require context edits were placed in "{0}" file'.format(log), 0)
 
 db.store().unload()

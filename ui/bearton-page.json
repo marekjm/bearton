@@ -128,6 +128,12 @@
             "local": true
         },
         {
+            "long": "context-edits-log",
+            "arguments": ["str"],
+            "help": "path to a file in which the list of required context edits will be stored",
+            "local": true
+        },
+        {
             "short": "y",
             "long": "yes",
             "requires": ["--wipe-db"]
