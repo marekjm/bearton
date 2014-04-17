@@ -1,0 +1,67 @@
+{
+    "query": [
+        {
+            "short": "l",
+            "long": "list"
+        },
+        {
+            "short": "s",
+            "long": "scheme",
+            "arguments": ["str"],
+            "help": "set scheme to query"
+        },
+        {
+            "short": "e",
+            "long": "element",
+            "arguments": ["str"],
+            "help": "set element to query"
+        }
+    ],
+    "update": [
+        {
+            "short": "W",
+            "long": "wipe",
+            "help": "wipe out the database"
+        },
+        {
+            "short": "y",
+            "long": "yes",
+            "help": "Bearton will not ask for confirmation when wiping the database out",
+            "requires": ["--wipe"]
+        },
+        {
+            "short": "l",
+            "long": "context-edits-log",
+            "arguments": ["str"],
+            "help": "path to a file in which the list of required context edits will be stored"
+        }
+    ],
+    "__global__": [
+        {
+            "short": "v",
+            "long": "verbose",
+            "help": "display more verbose output"
+        },
+        {
+            "short": "d",
+            "long": "debug",
+            "help": "display debugging output"
+        },
+        {
+            "short": "q",
+            "long": "quiet",
+            "help": "do not print normal messages"
+        },
+        {
+            "short": "h",
+            "long": "help",
+            "help": "dispay help message"
+        },
+        {
+            "short": "t",
+            "long": "target",
+            "arguments": ["str"],
+            "help": "set target directory"
+        }
+    ]
+}

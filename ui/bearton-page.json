@@ -29,24 +29,6 @@
             "help": "instantly launch editor after the page is created"
         }
     ],
-    "query": [
-        {
-            "short": "l",
-            "long": "list"
-        },
-        {
-            "short": "s",
-            "long": "scheme",
-            "arguments": ["str"],
-            "help": "set scheme to query"
-        },
-        {
-            "short": "e",
-            "long": "element",
-            "arguments": ["str"],
-            "help": "set element to query"
-        }
-    ],
     "edit": [
         {
             "short": "p",
@@ -110,33 +92,10 @@
             "help": "dispay help message"
         },
         {
-            "short": "w",
-            "long": "where",
+            "short": "t",
+            "long": "target",
             "arguments": ["str"],
-            "help": "set different target directory"
-        },
-        {
-            "short": "W",
-            "long": "wipe-db",
-            "help": "wipe out the database",
-            "local": true
-        },
-        {
-            "short": "U",
-            "long": "update-db",
-            "help": "updates metadata of entries in database with data read from (possibly) new scheme data",
-            "local": true
-        },
-        {
-            "long": "context-edits-log",
-            "arguments": ["str"],
-            "help": "path to a file in which the list of required context edits will be stored",
-            "local": true
-        },
-        {
-            "short": "y",
-            "long": "yes",
-            "requires": ["--wipe-db"]
+            "help": "set target directory"
         }
     ]
 }
