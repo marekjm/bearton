@@ -38,7 +38,7 @@ config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 if str(ui) == 'new':
     # Obtaining scheme and element
     scheme = (config.get('scheme') if 'scheme' in config else 'default')
-    scheme = (ui.arguments.pop(0) if len(ui.arguments) > 1 else 'default')
+    scheme = (ui.arguments.pop(0) if len(ui.arguments) > 1 else scheme)
     element = (ui.arguments.pop(0) if ui.arguments else '')
     if '--scheme' in ui: scheme = ui.get('-s')
     if '--element' in ui: element = ui.get('-e')
@@ -91,7 +91,9 @@ elif str(ui) == 'build':
     pages = (db.keys() if '--all' in ui else [i for i in ui.arguments])
     for page in pages:
         msgr.message('building page: {0}'.format(page), 0)
-        bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
+        if '--check' in ui:
+            msgr.message(bearton.page.builder.render(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr), 0)
+        else: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
 elif str(ui) == 'rm':
     page_id = ''
     if ui.arguments: page_id = ui.arguments[0]

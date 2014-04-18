@@ -68,6 +68,11 @@
             "short": "n",
             "long": "all-new",
             "help": "build all new pages"
+        },
+        {
+            "short": "c",
+            "long": "check",
+            "help": "prints built element to screen instead of writing it to file"
         }
     ],
     "__global__": [

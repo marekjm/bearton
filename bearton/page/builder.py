@@ -42,7 +42,7 @@ def loadbasecontexts(path, schemes, scheme, context, required, msgr):
             context[k] = v
     return context
 
-def build(path, schemes, page, msgr):
+def render(path, schemes, page, msgr):
     dbpath = os.path.join(path, '.bearton', 'db', 'pages')
     pagepath = os.path.join(dbpath, page)
     msgr.debug('schemes: {0}'.format(schemes))
@@ -56,7 +56,9 @@ def build(path, schemes, page, msgr):
     context = loadbasecontexts(path, schemes, meta['scheme'], context, gathered_base, msgr)
     msgr.debug('reading template')
     template = util.readfile(os.path.join(schemes, meta['scheme'], 'elements', meta['name'], 'template.mustache'))
-    rendered = muspyche.make(template, context, lookup=[os.path.join(schemes, meta['scheme'], 'elements')])
+    return muspyche.make(template, context, lookup=[os.path.join(schemes, meta['scheme'], 'elements')])
+
+def build(path, schemes, page, msgr):
     output = os.path.join(path, util.expandoutput(meta['output']))
     msgr.debug('written file to: {0}'.format(output))
-    util.writefile(output, rendered)
+    util.writefile(output, render(path, schemes, scheme, msgr))
