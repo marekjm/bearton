@@ -20,16 +20,24 @@ class Entry:
 
     def load(self):
         epath = os.path.join(self._path, self._entry)
-        self._meta = json.loads(util.readfile(os.path.join(epath, 'meta.json')))
+        meta = {'requires': {'contexts': [], 'base': []},
+                'output': '',
+                'singular': True,
+                'base': False,
+                }
+        loaded = json.loads(util.readfile(os.path.join(epath, 'meta.json')))
+        self._meta = util.dictmerge(meta, loaded, removals=False)
         self._context = json.loads(util.readfile(os.path.join(epath, 'context.json')))
         return self
 
     def _updatemeta(self, schemes):
         new_meta = json.loads(util.readfile(os.path.join(schemes, self._meta['scheme'], 'elements', self._meta['name'], 'meta.json')))
         scheme, name = self._meta['scheme'], self._meta['name']
+        output = (self._meta['output'] if not self._meta['singular'] else new_meta['output'])
         final = util.dictmerge(self._meta, new_meta)
         for k, v in [('scheme', scheme), ('name', name)]:
             if k not in final: final[k] = v
+        final['output'] = output
         code = 0
         if final != self._meta:
             self._meta = final
