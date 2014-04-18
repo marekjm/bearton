@@ -66,7 +66,7 @@ elif str(ui) == 'update':
     else:
         metadata, contexts = db.update(SCHEMES_PATH)
         for name, value in [('metadata', metadata), ('context', contexts)]:
-            if value: msgr.message('number of db entries with update to: {0}: {0}'.format(name, len(value)), 0)
+            if value: msgr.message('number of db entries with update to: {0}: {1}'.format(name, len(value)), 0)
         if contexts:
             log = os.path.join('.', 'bearton.required_context_edits.log')
             if '--context-edits-log' in ui: log = ui.get('--context-edits-log')
