@@ -14,6 +14,28 @@
     ],
     "rm": [
     ],
+    "inspect": [
+        {
+            "short": "e",
+            "long": "elements",
+            "help": "list all elements of a scheme"
+        },
+        {
+            "short": "B",
+            "long": "buildable",
+            "help": "list only buildable elements"
+        },
+        {
+            "short": "b",
+            "long": "base",
+            "help": "list only base elements"
+        },
+        {
+            "long": "not",
+            "wants": ["--buildable", "--base"],
+            "help": "negate modifier"
+        }
+    ],
     "__global__": [
         {
             "short": "v",

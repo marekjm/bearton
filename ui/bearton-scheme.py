@@ -58,8 +58,31 @@ elif str(ui) == 'rm':
     if not name:
         msgr.message('fatal: cannot define name of the scheme to remove')
         exit(1)
-
     bearton.schemes.loader.rm(os.path.join(SCHEMES_PATH, name), SITE_PATH, msgr)
+elif str(ui) == 'inspect':
+    name = (config.get('scheme') if 'scheme' in config else '')
+    if not name:
+        msgr.message('fatal: cannot define name of the scheme to remove')
+        exit(1)
+    if '--elements' in ui:
+        els = bearton.schemes.loader.getElementMetas(name)
+        if '--base' in ui:
+            f = []
+            for name, meta in els:
+                if 'base' in meta and meta['base']: f.append( (name, meta) )
+            if '--not' in ui: f = [i for i in els if i not in f]
+            els = f[:]
+        elif '--buildable' in ui:
+            f = []
+            for name, meta in els:
+                ok = 0
+                if 'output' in meta and meta['output'] != '': ok += 1
+                if 'base' not in meta or not meta['base']: ok += 1
+                if ok == 2: f.append( (name, meta) )
+            if '--not' in ui: f = [i for i in els if i not in f]
+            els = f[:]
+        output = str([name for name, meta in els])
+        msgr.message(output, 0)
 
 
 # Storing widely used objects state
