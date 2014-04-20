@@ -1,0 +1,34 @@
+{
+    "__global__": [
+        {
+            "short": "v",
+            "long": "verbose",
+            "help": "display more verbose output"
+        },
+        {
+            "short": "d",
+            "long": "debug",
+            "help": "display debugging output"
+        },
+        {
+            "short": "q",
+            "long": "quiet",
+            "help": "do not print normal messages"
+        },
+        {
+            "short": "h",
+            "long": "help",
+            "help": "dispay help message"
+        },
+        {
+            "long": "version",
+            "help": "display version information"
+        },
+        {
+            "short": "t",
+            "long": "target",
+            "arguments": ["str"],
+            "help": "set target directory"
+        }
+    ]
+}

@@ -38,6 +38,8 @@ config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 # -----------------------------
 #   UI logic code goes HERE!  |
 # -----------------------------
+if str(ui) == '':
+    if '--version' in ui: msgr.message(('bearton version {0}' if '--verbose' in ui else '{0}').format(bearton.__version__), 0)
 
 
 # Storing widely used objects state
