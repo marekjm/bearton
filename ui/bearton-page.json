@@ -73,6 +73,11 @@
             "short": "c",
             "long": "check",
             "help": "prints built element to screen instead of writing it to file"
+        },
+        {
+            "long": "no-print",
+            "requires": ["--check"],
+            "help": "do not print while checking"
         }
     ],
     "__global__": [

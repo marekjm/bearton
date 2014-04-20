@@ -92,7 +92,8 @@ elif str(ui) == 'build':
     for page in pages:
         msgr.message('building page: {0}'.format(page), 0)
         if '--check' in ui:
-            msgr.message(bearton.page.builder.render(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr), 0)
+            rendered = bearton.page.builder.render(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
+            if '--no-print' not in ui: msgr.message(rendered, 0)
         else: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
 elif str(ui) == 'rm':
     page_id = ''
