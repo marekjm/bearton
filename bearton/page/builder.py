@@ -8,18 +8,18 @@ import muspyche
 from .. import util
 from .. import config
 from .. import db
+from .. import schemes
 
 
-def gathercontexts(schemes, scheme, contexts, msgr):
-    msgr.debug('required contexts: {0}'.format(contexts))
-    gathered = []
-    while gathered != contexts:
-        gathered = contexts[:]
-        for i in contexts:
-            meta = json.loads(util.readfile(os.path.join(schemes, scheme, 'elements', i, 'meta.json')))
-            gathered.extend([con for con in meta['requires']['contexts'] if con not in gathered])
-        contexts = gathered[:]
-    msgr.debug('final required contexts: {0}'.format(contexts))
+def gathercontexts(pagepath, msgr, what='base'):
+    pagemeta = json.loads(util.readfile(os.path.join(pagepath, 'meta.json')))
+    msgr.debug('basic required contexts: {0}'.format(pagemeta['requires'][what]))
+    gathered = pagemeta['requires'][what][:]
+    for c in gathered:
+        meta = schemes.loader.getMeta(pagemeta['scheme'], c)
+        msgr.debug('element "{0}" requires these contexts: {1}: {2}'.format(c, what, meta['requires'][what]))
+        gathered.extend([el for el in meta['requires'][what] if el not in gathered])
+    msgr.debug('resolved required contexts: {0}'.format(gathered))
     return gathered
 
 def loadcontexts(schemes, scheme, context, required, msgr):
@@ -50,15 +50,16 @@ def render(path, schemes, page, msgr):
     msgr.debug('pagepath: {0}'.format(pagepath))
     meta = json.loads(util.readfile(os.path.join(pagepath, 'meta.json')))
     context = json.loads(util.readfile(os.path.join(pagepath, 'context.json')))
-    gathered = gathercontexts(schemes, meta['scheme'], meta['requires']['contexts'], msgr)
-    gathered_base = gathercontexts(schemes, meta['scheme'], meta['requires']['base'], msgr)
-    context = loadcontexts(schemes, meta['scheme'], context, gathered, msgr)
-    context = loadbasecontexts(path, schemes, meta['scheme'], context, gathered_base, msgr)
+    context = loadcontexts(schemes, meta['scheme'], context, gathercontexts(pagepath, msgr, 'contexts'), msgr)
+    context = loadbasecontexts(path, schemes, meta['scheme'], context, gathercontexts(pagepath, msgr, 'base'), msgr)
+    warnings.warn('exited here')
+    exit(127)
     msgr.debug('reading template')
     template = util.readfile(os.path.join(schemes, meta['scheme'], 'elements', meta['name'], 'template.mustache'))
     return muspyche.make(template, context, lookup=[os.path.join(schemes, meta['scheme'], 'elements')])
 
 def build(path, schemes, page, msgr):
+    meta = json.loads(util.readfile(os.path.join(path, '.bearton', 'db', 'pages', page, 'meta.json')))
     output = os.path.join(path, util.expandoutput(meta['output']))
     msgr.debug('written file to: {0}'.format(output))
-    util.writefile(output, render(path, schemes, scheme, msgr))
+    util.writefile(output, render(path, schemes, page, msgr))
