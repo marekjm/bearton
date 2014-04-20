@@ -44,7 +44,12 @@ def newbase(path, schemes_path, scheme, element, msgr=None):
         msgr.report()
 
 def edit(path, page, msgr):
-    msgr.debug('editing in: {0}'.format(path))
-    path = os.path.join(path, '.bearton', 'db')
-    msgr.debug('path to database: {0} ({1})'.format(path, ('OK' if os.path.isdir(path) else 'FAIL')))
-    msgr.debug('editing page: {0} ({1})'.format(page, ('OK' if os.path.isdir(os.path.join(path, page)) else 'FAIL')))
+    path = os.path.abspath(os.path.join(path, '.bearton', 'db', 'pages', page, 'context.json'))
+    editcmd = 'vim "{0}"'.format(path)
+    msgr.debug(editcmd)
+    if os.path.isfile(path):
+        ok = True
+        os.system(editcmd)
+    else:
+        ok = False
+    return ok
