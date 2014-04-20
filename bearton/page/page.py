@@ -45,7 +45,7 @@ def newbase(path, schemes_path, scheme, element, msgr=None):
 
 def edit(path, page, msgr):
     path = os.path.abspath(os.path.join(path, '.bearton', 'db', 'pages', page, 'context.json'))
-    editcmd = 'vim "{0}"'.format(path)
+    editcmd = '{0} "{1}"'.format(os.getenv('EDITOR', 'vim'), path)
     msgr.debug(editcmd)
     if os.path.isfile(path):
         ok = True
