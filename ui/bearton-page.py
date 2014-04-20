@@ -83,11 +83,14 @@ elif str(ui) == 'edit':
     page_id = ''
     if ui.arguments: page_id = ui.arguments[0]
     if '--page-id' in ui: page_id = ui.get('-p')
-    if not page_id:
+    if not page_id and '--from-file' not in ui:
         msgr.message('fail: page id is required')
         exit(1)
-    msgr.message('editing page {0}'.format(page_id))
-    bearton.page.page.edit(SITE_PATH, page_id, msgr)
+
+    ids = ([l.strip() for l in bearton.util.readfile(ui.get('--from-file')).split('\n')] if '-F' in ui else [page_id])
+    for i in ids:
+        msgr.message('editing page {0}'.format(i))
+        bearton.page.page.edit(SITE_PATH, i, msgr)
 elif str(ui) == 'render':
     pages = (db.keys() if '--all' in ui else [i for i in ui.arguments])
     for page in pages:

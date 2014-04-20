@@ -41,6 +41,12 @@
             "long": "base",
             "requires": ["--page-id"],
             "help": "tells Bearton it will be base element that needs editing"
+        },
+        {
+            "short": "F",
+            "long": "from-file",
+            "arguments": ["str"],
+            "help": "read page ids - newline separated - from file"
         }
     ],
     "rm": [
