@@ -21,12 +21,12 @@
             "help": "list all elements of a scheme"
         },
         {
-            "short": "B",
+            "short": "b",
             "long": "buildable",
             "help": "list only buildable elements"
         },
         {
-            "short": "b",
+            "short": "B",
             "long": "base",
             "help": "list only base elements"
         },

@@ -65,7 +65,7 @@ elif str(ui) == 'inspect':
         msgr.message('fatal: cannot define name of the scheme to remove')
         exit(1)
     if '--elements' in ui:
-        els = bearton.schemes.loader.getElementMetas(name)
+        els = bearton.schemes.inspector.getElementMetas(name)
         if '--base' in ui:
             f = []
             for name, meta in els:
