@@ -34,12 +34,12 @@
             "short": "p",
             "long": "page-id",
             "arguments": ["str"],
-            "required": true,
             "help": "specify page id"
         },
         {
             "short": "b",
             "long": "base",
+            "requires": ["--page-id"],
             "help": "tells Bearton it will be base element that needs editing"
         }
     ],
@@ -52,7 +52,7 @@
             "help": "specify page id"
         }
     ],
-    "build": [
+    "render": [
         {
             "short": "S",
             "long": "schemes",

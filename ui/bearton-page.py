@@ -87,7 +87,8 @@ elif str(ui) == 'edit':
         msgr.message('fail: page id is required')
         exit(1)
     msgr.message('editing page {0}'.format(page_id))
-elif str(ui) == 'build':
+    bearton.page.page.edit(SITE_PATH, page_id, msgr)
+elif str(ui) == 'render':
     pages = (db.keys() if '--all' in ui else [i for i in ui.arguments])
     for page in pages:
         msgr.message('building page: {0}'.format(page), 0)
