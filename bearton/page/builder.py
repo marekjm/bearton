@@ -13,11 +13,10 @@ from .. import schemes
 
 def gathercontexts(pagepath, msgr, what='base'):
     pagemeta = json.loads(util.readfile(os.path.join(pagepath, 'meta.json')))
-    msgr.debug('basic required contexts: {0}'.format(pagemeta['requires'][what]))
+    msgr.debug('directly required contexts: {0}'.format(pagemeta['requires'][what]))
     gathered = pagemeta['requires'][what][:]
     for c in gathered:
-        meta = schemes.loader.getMeta(pagemeta['scheme'], c)
-        msgr.debug('element "{0}" requires these contexts: {1}: {2}'.format(c, what, meta['requires'][what]))
+        meta = schemes.inspector.getMeta(pagemeta['scheme'], c)
         gathered.extend([el for el in meta['requires'][what] if el not in gathered])
     msgr.debug('resolved required contexts: {0}'.format(gathered))
     return gathered
@@ -43,6 +42,7 @@ def loadbasecontexts(path, schemes, scheme, context, required, msgr):
     return context
 
 def render(path, schemes, page, msgr):
+    path = os.path.abspath(path)
     dbpath = os.path.join(path, '.bearton', 'db', 'pages')
     pagepath = os.path.join(dbpath, page)
     msgr.debug('schemes: {0}'.format(schemes))
@@ -52,10 +52,9 @@ def render(path, schemes, page, msgr):
     context = json.loads(util.readfile(os.path.join(pagepath, 'context.json')))
     context = loadcontexts(schemes, meta['scheme'], context, gathercontexts(pagepath, msgr, 'contexts'), msgr)
     context = loadbasecontexts(path, schemes, meta['scheme'], context, gathercontexts(pagepath, msgr, 'base'), msgr)
-    warnings.warn('exited here')
-    exit(127)
-    msgr.debug('reading template')
-    template = util.readfile(os.path.join(schemes, meta['scheme'], 'elements', meta['name'], 'template.mustache'))
+    template = os.path.join(schemes, meta['scheme'], 'elements', meta['name'], 'template.mustache')
+    msgr.debug('reading template: {0}'.format(template))
+    template = util.readfile(template)
     return muspyche.make(template, context, lookup=[os.path.join(schemes, meta['scheme'], 'elements')])
 
 def build(path, schemes, page, msgr):
