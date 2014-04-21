@@ -36,21 +36,26 @@ config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 
 
 if str(ui) == 'query':
-    queryd = {}
-    if len(ui.arguments) > 2:
-        msgr.message('fatal: invalid number of operands: expected at most 2 but got {0}'.format(len(ui.arguments)))
-        exit(1)
-    scheme = (ui.arguments.pop(0) if len(ui.arguments) == 2 else config.get('scheme'))
-    scheme = (ui.get('-s') if '--scheme' in ui else scheme)
-    element = (ui.arguments.pop(0) if ui.arguments else '')
-    element = (ui.get('-e') if '--element' in ui else element)
-    for a in ui.arguments:
-        if '=' not in a: continue
-        a = a.split('=', 1)
-        key, value = a[0], a[1]
-        queryd[key] = value
-    msgr.debug('query: scheme={0}, element={1}, queryd={2}'.format(scheme, element, queryd))
-    pages = [key for key, entry in (bearton.db.db(path=SITE_PATH, base=True).load() if '--base' in ui else db).query(scheme, element, queryd)]
+    if '--raw' in ui:
+        scheme, element, queryd, querytags = db._parsequery(ui.get('-r'))
+    else:
+        if len(ui.arguments) > 2:
+            msgr.message('fatal: invalid number of operands: expected at most 2 but got {0}'.format(len(ui.arguments)))
+            exit(1)
+        scheme = (ui.arguments.pop(0) if len(ui.arguments) == 2 else config.get('scheme'))
+        scheme = (ui.get('-s') if '--scheme' in ui else scheme)
+        element = (ui.arguments.pop(0) if ui.arguments else '')
+        element = (ui.get('-e') if '--element' in ui else element)
+        queryd = {}
+        for a in ui.arguments:
+            if '=' not in a: continue
+            a = a.split('=', 1)
+            key, value = a[0], a[1]
+            queryd[key] = value
+        querytags = (ui.get('--tags').split(',') if '--tags' in ui else [])
+    msgr.debug('query: scheme={0}, element={1}, queryd={2}, querytags={3}'.format(scheme, element, queryd, querytags))
+    pages = (bearton.db.db(path=SITE_PATH, base=True).load() if '--base' in ui else db).query(scheme, element, queryd, querytags)
+    pages = [key for key, entry in pages]
     for i in pages:
         if '--verbose' in ui:
             msg = db.get(i).getsignature(('{:key@}: {:name@meta}@{:scheme@meta}' if '--format' not in ui else ui.get('-F')))

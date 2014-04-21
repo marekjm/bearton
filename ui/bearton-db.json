@@ -23,6 +23,13 @@
             "short": "b",
             "long": "base",
             "help": "query base-type elements"
+        },
+        {
+            "short": "r",
+            "long": "raw",
+            "arguments": ["str"],
+            "conflicts": ["-s", "-e"],
+            "help": "takes raw query string (see doc/ to learn how to write them)"
         }
     ],
     "update": [
