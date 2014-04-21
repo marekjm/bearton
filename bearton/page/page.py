@@ -27,6 +27,7 @@ def new(path, schemes_path, scheme, element, msgr):
     msgr.debug('scheme used: {0}'.format(scheme))
     if 'scheme' not in entry._meta: entry.setinmeta('scheme', scheme)
     if 'name' not in entry._meta: entry.setinmeta('name', element)
+    entry.setinmeta('output', util.expandoutput(entry.metag('output')))
     entry.store()
     return hashed
 
