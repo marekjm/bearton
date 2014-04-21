@@ -3,6 +3,7 @@
 
 
 import os
+import re
 import sys
 import time
 
@@ -103,7 +104,12 @@ def expandoutput(s):
                'epoch': epoch,
                }
     for key, value in context.items():
-        s = s.replace(('{{'+key+'}}'), str(value))
+        s = s.replace(('{:'+key+'}'), str(value))
+    regex_key = re.compile('{:([a-zA-Z-_]+)}')
+    keys = regex_key.findall(s)
+    for key in keys:
+        value = input('{0}: '.format(key))
+        s = s.replace(('{:'+key+'}'), value)
     return s
 
 
