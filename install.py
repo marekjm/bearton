@@ -75,7 +75,7 @@ def install():
         width += 4
         for f in uis:
             source = f
-            target = os.path.join(bin_path, os.path.split(f)[1])
+            target = os.path.join(bin_path, os.path.splitext(os.path.split(f)[1])[0])
             print('cp:', source.ljust(width), '->', target)
             shutil.copy(source, target)
 
