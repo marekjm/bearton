@@ -36,32 +36,27 @@ config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 
 
 if str(ui) == 'query':
-    if '--list' in ui:
-        pages = db.keys()
-    else:
-        queryd = {}
-        if len(ui.arguments) > 2:
-            msgr.message('fatal: invalid number of operands: expected at most 2 but got {0}'.format(len(ui.arguments)))
-            exit(1)
-        scheme = (ui.arguments.pop(0) if len(ui.arguments) == 2 else config.get('scheme'))
-        scheme = (ui.get('-s') if '--scheme' in ui else scheme)
-        element = (ui.arguments.pop(0) if ui.arguments else '')
-        element = (ui.get('-e') if '--element' in ui else element)
-        for a in ui.arguments:
-            if '=' not in a: continue
-            a = a.split('=', 1)
-            key, value = a[0], a[1]
-            queryd[key] = value
-        msgr.debug('query: scheme={0}, element={1}, queryd={2}'.format(scheme, element, queryd))
-        pages = [key for key, entry in db.query(scheme, element, queryd)]
-        #for key, entry in pool:
-        #    msgr.message(key, 0)
+    queryd = {}
+    if len(ui.arguments) > 2:
+        msgr.message('fatal: invalid number of operands: expected at most 2 but got {0}'.format(len(ui.arguments)))
+        exit(1)
+    scheme = (ui.arguments.pop(0) if len(ui.arguments) == 2 else config.get('scheme'))
+    scheme = (ui.get('-s') if '--scheme' in ui else scheme)
+    element = (ui.arguments.pop(0) if ui.arguments else '')
+    element = (ui.get('-e') if '--element' in ui else element)
+    for a in ui.arguments:
+        if '=' not in a: continue
+        a = a.split('=', 1)
+        key, value = a[0], a[1]
+        queryd[key] = value
+    msgr.debug('query: scheme={0}, element={1}, queryd={2}'.format(scheme, element, queryd))
+    pages = [key for key, entry in db.query(scheme, element, queryd)]
     for i in pages:
         if '--verbose' in ui:
             msg = db.get(i).getsignature(('{:key@}: {:name@meta}@{:scheme@meta}' if '--format' not in ui else ui.get('-F')))
         else:
             msg = i
-        msgr.message(msg)
+        msgr.message(msg, 0)
 elif str(ui) == 'update':
     if '--wipe' in ui:
         really = ('yes' if '--yes' in ui else input('do you really want to wipe out the database? [y/n] '))
