@@ -30,8 +30,9 @@ SCHEMES_PATH = (ui.get('-S') if '--schemes' in ui else bearton.util.getschemespa
 
 
 # Creating widely used objects
-msgr = bearton.util.Messenger(verbosity=0, debugging=('--debug' in ui), quiet=('--quiet' in ui))
-db = bearton.db.Database(path=SITE_PATH).load()
+# if --verbose is used, msgr has a verbosity level 1; else it is 0
+msgr = bearton.util.Messenger(verbosity=int('--verbose' in ui), debugging=('--debug' in ui), quiet=('--quiet' in ui))
+db = bearton.db.db(path=SITE_PATH).load()
 config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 
 
