@@ -30,7 +30,7 @@ SCHEMES_PATH = (ui.get('-S') if '--schemes' in ui else bearton.util.getschemespa
 
 
 # Creating widely used objects
-msgr = bearton.util.Messenger(verbosity=0, debugging=('--debug' in ui), quiet=('--quiet' in ui))
+msgr = bearton.util.Messenger(verbosity=int('--verbose' in ui), debugging=('--debug' in ui), quiet=('--quiet' in ui))
 db = bearton.db.Database(path=SITE_PATH).load()
 config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 
@@ -75,10 +75,8 @@ if str(ui) == 'new':
     # Actual call creating new page in database
     creator = (bearton.page.page.newbase if '--base' in ui else bearton.page.page.new)
     hashed = creator(path=SITE_PATH, schemes_path=SCHEMES_PATH, scheme=scheme, element=element, msgr=msgr)
-    # Editing?
     if '--edit' in ui: bearton.page.page.edit(path=SITE_PATH, page=hashed, msgr=msgr)
-    # Final message
-    msgr.message('created new page: {0}'.format(hashed), 0)
+    else: msgr.message(hashed, 0)
 elif str(ui) == 'edit':
     page_id = ''
     if ui.arguments: page_id = ui.arguments[0]
@@ -89,11 +87,11 @@ elif str(ui) == 'edit':
 
     ids = ([l.strip() for l in bearton.util.readfile(ui.get('--from-file')).split('\n')] if '-F' in ui else [page_id])
     for i in ids:
-        bearton.page.page.edit(SITE_PATH, i, msgr)
+        bearton.page.page.edit(SITE_PATH, i, ('--base' in ui), msgr)
 elif str(ui) == 'render':
     pages = (db.keys() if '--all' in ui else [i for i in ui.arguments])
     for page in pages:
-        msgr.message('building page: {0}'.format(page), 0)
+        msgr.message('rendering page: {0}'.format(page), 1)
         if '--check' in ui:
             rendered = bearton.page.builder.render(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
             if '--no-print' not in ui: msgr.message(rendered, 0)
