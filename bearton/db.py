@@ -49,7 +49,7 @@ class Entry:
     def _updatecontext(self, schemes):
         new = json.loads(util.readfile(os.path.join(schemes, self._meta['scheme'], 'elements', self._meta['name'], 'context.json')))
         code = 0
-        final = util.dictmerge(base=self._context, update=new, overwrites=False)
+        final = util.dictmerge(base=self._context, update=new, overwrites=False, allow_ow=['home'])
         code = 0
         if final != self._context:
             self._context = final
@@ -110,8 +110,8 @@ class Entry:
     def store(self):
         epath = os.path.join(self._path, self._entry)
         if self._changed:
-            util.writefile(os.path.join(epath, 'meta.json'), json.dumps(self._meta))
-            util.writefile(os.path.join(epath, 'context.json'), json.dumps(self._context))
+            util.writefile(os.path.join(epath, 'meta.json'), json.dumps(self._meta), encoding=None)
+            util.writefile(os.path.join(epath, 'context.json'), json.dumps(self._context), encoding=None)
         self._changed = False
 
     def remove(self):
@@ -122,9 +122,13 @@ class Database:
     """Object providing database interface.
     """
     def __init__(self, path):
+        self._path, self._rawpath = '', ''
+        self._db = None
+        self.__setpath__(path)
+
+    def __setpath__(self, path):
         self._path = os.path.join(path, '.bearton', 'db', 'pages')
         self._rawpath = path
-        self._db = None
 
     def __iter__(self):
         return iter([self._db[key] for key in self._db])
@@ -208,3 +212,17 @@ class Database:
             if ret_code in [1, 3] and entry._entry not in metadata: metadata.append(entry._entry)
             if ret_code in [2, 3] and entry._entry not in contexts: contexts.append(entry._entry)
         return (metadata, contexts)
+
+
+class DatabaseOfBase(Database):
+    """Database of base elements.
+    """
+    def __init__(self, path):
+        self._path = os.path.join(path, '.bearton', 'db', 'base')
+        self._rawpath = path
+
+
+def db(path, base):
+    """Function returning returning correct database object.
+    """
+    return (DatabaseOfBase if base else Database)(path)
