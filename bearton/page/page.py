@@ -43,8 +43,8 @@ def newbase(path, schemes_path, scheme, element, msgr=None):
         msgr.call(shutil.copy, os.path.join(element_path, f), os.path.join(basepath, f))
         msgr.report()
 
-def edit(path, page, msgr):
-    path = os.path.abspath(os.path.join(path, '.bearton', 'db', 'pages', page, 'context.json'))
+def edit(path, page, base, msgr):
+    path = os.path.abspath(os.path.join(path, '.bearton', 'db', ('base' if base else 'pages'), page, 'context.json'))
     editcmd = '{0} "{1}"'.format(os.getenv('EDITOR', 'vim'), path)
     msgr.debug(editcmd)
     if os.path.isfile(path):
