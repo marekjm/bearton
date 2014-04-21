@@ -15,6 +15,13 @@
             "long": "element",
             "arguments": ["str"],
             "help": "set element to query"
+        },
+        {
+            "short": "F",
+            "long": "format",
+            "arguments": ["str"],
+            "requires": ["--verbose"],
+            "help": "print strings in given format"
         }
     ],
     "update": [
