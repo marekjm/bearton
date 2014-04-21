@@ -11,19 +11,32 @@ from .. import db
 from .. import schemes
 
 
-def gathercontexts(pagepath, msgr, what='base'):
+def gathercontexts(path, pagepath, msgr, what='base'):
     pagemeta = json.loads(util.readfile(os.path.join(pagepath, 'meta.json')))
     msgr.debug('directly required contexts: {0}'.format(pagemeta['requires'][what]))
     gathered = pagemeta['requires'][what][:]
     for c in gathered:
-        meta = schemes.inspector.getMeta(pagemeta['scheme'], c)
-        gathered.extend([el for el in meta['requires'][what] if el not in gathered])
+        if c[0] == '#':
+            required = [c]
+        else:
+            required = schemes.inspector.getMeta(pagemeta['scheme'], c)['requires'][what]
+        gathered.extend([el for el in required if el not in gathered])
     msgr.debug('resolved required contexts: {0}'.format(gathered))
     return gathered
 
-def loadcontexts(schemes, scheme, context, required, msgr):
+def loadcontexts(path, schemes, scheme, context, required, msgr):
     for element in required:
-        cntxt = json.loads(util.readfile(os.path.join(schemes, scheme, 'elements', element, 'context.json')))
+        if element[0] == '#':
+            key, query = tuple(element[1:].split(':', 1))
+            msgr.debug('creating context with key "{0}" from query: {1}'.format(key, query))
+            got = db.db(path=path).load().rawquery(query=query)
+            cntxt = [entry._context for key, entry in got]
+            for i, en in enumerate(got):
+                en = en[1]
+                cntxt[i]['meta'] = en._meta
+            cntxt = {key: cntxt}
+        else:
+            cntxt = json.loads(util.readfile(os.path.join(schemes, scheme, 'elements', element, 'context.json')))
         for k, v in cntxt.items():
             if k in context: msgr.message('warning: key conflict in context: {0}: {1} -> {2}'.format(k, context[k], v))
             context[k] = v
@@ -31,6 +44,8 @@ def loadcontexts(schemes, scheme, context, required, msgr):
 
 def loadbasecontexts(path, schemes, scheme, context, required, msgr):
     for element in required:
+        if element[0] == '#':
+            continue
         conpath = os.path.join(path, '.bearton', 'db', 'base', element, 'context.json')
         if not os.path.isfile(conpath):
             msgr.debug('warning: loading default context for base element: {0}'.format(element))
@@ -50,8 +65,8 @@ def render(path, schemes, page, msgr):
     msgr.debug('pagepath: {0}'.format(pagepath))
     meta = json.loads(util.readfile(os.path.join(pagepath, 'meta.json')))
     context = json.loads(util.readfile(os.path.join(pagepath, 'context.json')))
-    context = loadcontexts(schemes, meta['scheme'], context, gathercontexts(pagepath, msgr, 'contexts'), msgr)
-    context = loadbasecontexts(path, schemes, meta['scheme'], context, gathercontexts(pagepath, msgr, 'base'), msgr)
+    context = loadcontexts(path, schemes, meta['scheme'], context, gathercontexts(path, pagepath, msgr, 'contexts'), msgr)
+    context = loadbasecontexts(path, schemes, meta['scheme'], context, gathercontexts(path, pagepath, msgr, 'base'), msgr)
     template = os.path.join(schemes, meta['scheme'], 'elements', meta['name'], 'template.mustache')
     msgr.debug('reading template: {0}'.format(template))
     template = util.readfile(template)
