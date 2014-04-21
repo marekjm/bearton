@@ -50,7 +50,7 @@ if str(ui) == 'query':
         key, value = a[0], a[1]
         queryd[key] = value
     msgr.debug('query: scheme={0}, element={1}, queryd={2}'.format(scheme, element, queryd))
-    pages = [key for key, entry in db.query(scheme, element, queryd)]
+    pages = [key for key, entry in (bearton.db.db(path=SITE_PATH, base=True).load() if '--base' in ui else db).query(scheme, element, queryd)]
     for i in pages:
         if '--verbose' in ui:
             msg = db.get(i).getsignature(('{:key@}: {:name@meta}@{:scheme@meta}' if '--format' not in ui else ui.get('-F')))

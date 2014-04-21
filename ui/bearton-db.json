@@ -18,6 +18,11 @@
             "arguments": ["str"],
             "requires": ["--verbose"],
             "help": "print strings in given format"
+        },
+        {
+            "short": "b",
+            "long": "base",
+            "help": "query base-type elements"
         }
     ],
     "update": [
