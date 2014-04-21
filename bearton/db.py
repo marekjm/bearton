@@ -127,8 +127,9 @@ class Database:
         self.__setpath__(path)
 
     def __setpath__(self, path):
-        self._path = os.path.join(path, '.bearton', 'db', 'pages')
-        self._rawpath = path
+        """Must set correct _path and _rawpath instance variables.
+        """
+        raise Exception('method needs overriding in subclass: {0}'.format(type(self)))
 
     def __iter__(self):
         return iter([self._db[key] for key in self._db])
@@ -178,7 +179,9 @@ class Database:
         subdb = {}
         for key, entry in self._db.items():
             if not scheme and not element: continue
-            if (scheme == entry._meta['scheme'] if scheme else True) and (element == entry._meta['name'] if element else True): subdb[key] = entry
+            mscheme = (scheme == entry._meta['scheme'] if scheme else True)
+            melem = (element == entry._meta['name'] if element else True)
+            if mscheme and melem: subdb[key] = entry
         pool = []
         for key, entry in subdb.items():
             match = 0   # TODO: match should be an indicator of how well the entry matches the query
@@ -189,6 +192,27 @@ class Database:
                     if entry._meta[k] == queryd[k]: match += 1
             if match > 0: pool.append( (key, entry) )
         return pool
+
+    def _parsequery(self, s):
+        """Parses raw query strings.
+        """
+        element, scheme = '', ''
+        queryd = {}
+        tags = []
+        q = s.split('&')
+        if len(q) > 3: raise TypeError('invalid query string: "{0}"'.format(s))
+        while len(q) < 3: q.append('')
+        element, scheme = (tuple(q[0].split('@')) if '@' in q[0] else (q[0], ''))
+        for i in q[1].split(','):
+            key, value = (tuple(i.split('=')) if '=' in i else (i, ''))
+            if key: queryd[key] = value
+        tags = [i for i in q[2].split(',') if i]
+        return (scheme, element, queryd, tags)
+
+    def rawquery(self, query):
+        """Accepts raw query string and runs a query that it describes.
+        """
+        return self.query(*self._parsequery(query))
 
     def get(self, key):
         return self._db[key]
@@ -214,15 +238,23 @@ class Database:
         return (metadata, contexts)
 
 
+class DatabaseOfPages(Database):
+    """Database of page-type elements.
+    """
+    def __setpath__(self, path):
+        self._path = os.path.join(path, '.bearton', 'db', 'pages')
+        self._rawpath = path
+
+
 class DatabaseOfBase(Database):
     """Database of base elements.
     """
-    def __init__(self, path):
+    def __setpath__(self, path):
         self._path = os.path.join(path, '.bearton', 'db', 'base')
         self._rawpath = path
 
 
-def db(path, base):
+def db(path, base=False):
     """Function returning returning correct database object.
     """
-    return (DatabaseOfBase if base else Database)(path)
+    return (DatabaseOfBase if base else DatabaseOfPages)(path)
