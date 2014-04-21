@@ -161,17 +161,13 @@ class Database:
 
         After initial scheme/element matching, queryd-matching is performed
         against sub-pool of previously matched entries.
-        It is key-to-key matching - if key is present in queryd but not in given entry,
-        entry is not matched.
 
-        Queryd matching logic:
+        Queryd matching logic (TODO: implement it, but corrent works so according to "worse is better" we can live with it):
 
         - if key is present in neither meta nor context, entry is not matched;
-        - if key is present in queryd and in meta, increase match by one;
-            - if values of the key are equal, increase match by one;
-        - if key is present queryd and in context, increase match by one;
-            - if values of the key are equal, increase match by one;
-        - if key is present in BOTH meta and context (is an ambigious one), divide match by two;
+        - if key is present in queryd and in meta and if values of the key are equal, increase match by one;
+        - if key is present queryd and in context and if values of the key are equal, increase match by one;
+        - if key is present in BOTH meta and context (is an ambigious one), decrease match by one;
         - for every tag present both in querytags and entry tags, increase match by one;
         - for every tag that is required to be matched and is not present in tags, decrease match by one, else increase by one;
         - for every tag that is required to be NOT matched and is present in tags, decrease match by one, else increase by one;
@@ -188,7 +184,6 @@ class Database:
             if not len(queryd.keys()): match = 2
             for k, v in queryd.items():
                 if k in entry._meta:
-                    match += 1
                     if entry._meta[k] == queryd[k]: match += 1
             if match > 0: pool.append( (key, entry) )
         return pool
