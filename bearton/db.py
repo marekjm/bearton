@@ -3,6 +3,7 @@
 
 import json
 import os
+import re
 import shutil
 
 from . import util
@@ -73,6 +74,39 @@ class Entry:
         self._meta[key] = value
         self._changed = True
 
+    def metag(self, key):
+        return self._meta[key]
+
+    def getsignature(self, s):
+        """Provides convinient way to get database entry's signature.
+        Signature is a string containing field-identifiers - special substrings which return values from entry's meta or
+        context.
+
+        TODO: only access to top-level keys is provided.
+
+        Identifiers can have a form of:
+
+        {:key@}                 - returns key (hash id) of the entry, "key" is hardcoded,
+        {:foo@meta}             - returns value of 'foo' from entry's meta,
+        {:foo@context}, {:foo}  - returns value of 'foo' from entry's context,
+
+        Keys that are not found in meta or context return empty strings.
+        """
+        regex_key = re.compile('{:([a-z0-9-_]+)(@[a-z0-9-_]*)?}')
+        keys = regex_key.findall(s)
+        for key, where in keys:
+            identifier = '{:' + '{0}{1}'.format(key, where) + '}'
+            if where == '@' and key == 'key':
+                value = self._entry
+            elif where in ['@meta', '']:
+                value = (self._meta[key] if key in self._meta else '')
+            elif where == '@context':
+                value = (self._context[key] if key in self._context else '')
+            else:
+                raise KeyError('invalid identifier: {0}'.format(identifier))
+            s = s.replace(identifier, value)
+        return s
+
     def store(self):
         epath = os.path.join(self._path, self._entry)
         if self._changed:
@@ -114,22 +148,46 @@ class Database:
     def keys(self):
         return [key for key in self._db]
 
-    def query(self, scheme, element, queryd={}):
+    def query(self, scheme, element, queryd={}, querytags=[]):
+        """Queries database.
+        First, it matches scheme and elemeent.
+        If scheme is empty or element is empty, only one will be used to match.
+        If both scheme and element are empty, nothing will be matched.
+
+        After initial scheme/element matching, queryd-matching is performed
+        against sub-pool of previously matched entries.
+        It is key-to-key matching - if key is present in queryd but not in given entry,
+        entry is not matched.
+
+        Queryd matching logic:
+
+        - if key is present in neither meta nor context, entry is not matched;
+        - if key is present in queryd and in meta, increase match by one;
+            - if values of the key are equal, increase match by one;
+        - if key is present queryd and in context, increase match by one;
+            - if values of the key are equal, increase match by one;
+        - if key is present in BOTH meta and context (is an ambigious one), divide match by two;
+        - for every tag present both in querytags and entry tags, increase match by one;
+        - for every tag that is required to be matched and is not present in tags, decrease match by one, else increase by one;
+        - for every tag that is required to be NOT matched and is present in tags, decrease match by one, else increase by one;
+        """
         subdb = {}
         for key, entry in self._db.items():
-            if scheme == entry._meta['scheme'] and element == entry._meta['name']: subdb[key] = entry
+            if not scheme and not element: continue
+            if (scheme == entry._meta['scheme'] if scheme else True) and (element == entry._meta['name'] if element else True): subdb[key] = entry
         pool = []
         for key, entry in subdb.items():
-            match = True
+            match = 0   # TODO: match should be an indicator of how well the entry matches the query
+            if not len(queryd.keys()): match = 2
             for k, v in queryd.items():
-                if k not in entry._meta:
-                    match = False
-                    break
-                if entry._meta[k] != queryd[k]:
-                    match = False
-                    break
-            if match: pool.append( (key, entry) )
+                if k in entry._meta:
+                    match += 1
+                    if entry._meta[k] == queryd[k]: match += 1
+            if match > 0: pool.append( (key, entry) )
         return pool
+
+    def get(self, key):
+        return self._db[key]
 
     def wipe(self):
         for entry in self: entry.remove()
