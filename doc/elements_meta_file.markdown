@@ -15,7 +15,8 @@ Ever-up-to-date list of keys can be found in source code of Bearton.
 ```
 {
     "requires": {
-        "contexts": ["head", "header", "footer"]
+        "contexts": [""],
+        "base": ["head", "header", "footer"]
     },
     "output": "index.html",
     "singular": true,
@@ -37,13 +38,35 @@ Sub-keys of this dict are described here with preceding `requires.`.
 **`requires.contexts`**
 
 This is a list of contexts the element requires to be correctly rendered.
+Each context can be a name (for singular objects) or a query.
+
+Singular contexts are directly merged into main context.  
+Query contexts are inserted as a list.
+
+*Query contexts*
+
+If first character of a context is a hashbang - `#` - Bearton will interpret it as a query.
+
+Syntax: `#field:element@scheme&key=value(,key=value)*&tag0,tag1(,tagN)*;`
+
+Elements of the query, except for the first - field name element - are separated by ampersand symbol: `&`.
+
+List of elements:
+
+- `field`: specifies name under which the list resulting from the query will be inserted;
+- `element@scheme`: `element` is a name of the element, and `scheme` is the name of the scheme - one may be omitted, omission of both will result in an empty query;
+- `key=value(,key=value)`: comma separated list of key/value pairs to form *query dict* (a.k.a. queryd), neither key nor value may contain comma or ampersand characters;
+- `tag0,tag1(,tagN)*`: comma separated list of tags to match;
 
 ----
 
 **`requires.base`**
 
 This is a list of *base* contexts the element requires to be correctly rendered.
-Such contexts are first looked for in database.
+Base contexts are first looked for in the database, if base is not found in the db defaults are
+loaded from scheme.  
+Such behaviour means that for one-shot schemes, it is reasonable to not to create db entries for
+base elements -- because then we remove the need to update database after scheme updates.
 
 ----
 
