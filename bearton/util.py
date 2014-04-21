@@ -84,10 +84,13 @@ def readfile(path, encoding='utf-8'):
 
 def writefile(path, s, encoding='utf-8'):
     """Writes a file.
+    By default, writes as bytes.
+    To write as string, pass `encoding` as None.
     """
-    ofstream = open(path, 'wb')
+    ofstream = open(path, ('wb' if encoding is not None else 'w'))
     if encoding is not None: s = s.encode(encoding)
     ofstream.write(s)
+    ofstream.close()
 
 
 def expandoutput(s):
@@ -122,16 +125,17 @@ def dictsimilarise(base, update):
             new[key] = update[key]
     return new
 
-def dictupdate(base, update, overwrites=True, removals=True):
+def dictupdate(base, update, overwrites=True, allow_ow=[], removals=True):
     """Updates all values present in base with values present in update.
     If `removals` is true, removes all keys that are not present in update.
     Else, leaves them as they were.
+    `allow_ow` is a list of keys for which aoverwrites are allowed.
     """
     new = {}
     for key in base:
         if key in update:
-            if overwrites:
-                if type(base[key]) == dict and type(update[key]) == dict: value = dictupdate(base[key], update[key], overwrites, removals)
+            if overwrites or key in allow_ow:
+                if type(base[key]) == dict and type(update[key]) == dict: value = dictupdate(base[key], update[key], overwrites, allow_ow, removals)
                 else: value = update[key]
             else: value = base[key]
             new[key] = value
