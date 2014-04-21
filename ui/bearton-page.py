@@ -89,7 +89,6 @@ elif str(ui) == 'edit':
 
     ids = ([l.strip() for l in bearton.util.readfile(ui.get('--from-file')).split('\n')] if '-F' in ui else [page_id])
     for i in ids:
-        msgr.message('editing page {0}'.format(i))
         bearton.page.page.edit(SITE_PATH, i, msgr)
 elif str(ui) == 'render':
     pages = (db.keys() if '--all' in ui else [i for i in ui.arguments])
