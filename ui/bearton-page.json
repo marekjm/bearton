@@ -27,6 +27,12 @@
             "short": "E",
             "long": "edit",
             "help": "instantly launch editor after the page is created"
+        },
+        {
+            "short": "R",
+            "long": "render",
+            "requires": ["--edit"],
+            "help": "render the page instantly after it is created and edited"
         }
     ],
     "edit": [

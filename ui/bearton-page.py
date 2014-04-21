@@ -75,8 +75,9 @@ if str(ui) == 'new':
     # Actual call creating new page in database
     creator = (bearton.page.page.newbase if '--base' in ui else bearton.page.page.new)
     hashed = creator(path=SITE_PATH, schemes_path=SCHEMES_PATH, scheme=scheme, element=element, msgr=msgr)
-    if '--edit' in ui: bearton.page.page.edit(path=SITE_PATH, page=hashed, msgr=msgr)
+    if '--edit' in ui: bearton.page.page.edit(path=SITE_PATH, page=hashed, base=('--base' in ui), msgr=msgr)
     else: msgr.message(hashed, 0)
+    if '--render' in ui: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=hashed, msgr=msgr)
 elif str(ui) == 'edit':
     page_id = ''
     if ui.arguments: page_id = ui.arguments[0]

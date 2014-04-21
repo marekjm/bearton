@@ -20,6 +20,12 @@
             "help": "print strings in given format"
         },
         {
+            "short": "O",
+            "long": "with-output",
+            "conflicts": ["--format"],
+            "help": "display output paths of matched pages"
+        },
+        {
             "short": "b",
             "long": "base",
             "help": "query base-type elements"
