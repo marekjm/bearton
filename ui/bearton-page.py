@@ -3,6 +3,7 @@
 import json
 import os
 from sys import argv
+import warnings
 
 import clap
 
@@ -36,6 +37,8 @@ config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 
 
 if str(ui) == 'new':
+    """This mode is employed for creating new pages.
+    """
     # Obtaining scheme and element
     scheme = (config.get('scheme') if 'scheme' in config else 'default')
     scheme = (ui.arguments.pop(0) if len(ui.arguments) > 1 else scheme)
@@ -79,6 +82,8 @@ if str(ui) == 'new':
     else: msgr.message(hashed, 0)
     if '--render' in ui: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=hashed, msgr=msgr)
 elif str(ui) == 'edit':
+    """This mode is employed for editing existing pages.
+    """
     page_id = ''
     if ui.arguments: page_id = ui.arguments[0]
     if '--page-id' in ui: page_id = ui.get('-p')
@@ -89,7 +94,11 @@ elif str(ui) == 'edit':
     ids = ([l.strip() for l in bearton.util.readfile(ui.get('--from-file')).split('\n')] if '-F' in ui else [page_id])
     for i in ids:
         bearton.page.page.edit(SITE_PATH, i, ('--base' in ui), msgr)
+    if '--render' in ui:
+        for i in ids: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=i, msgr=msgr)
 elif str(ui) == 'render':
+    """This mode is used to render individua pages, groups of pages or whole sites.
+    """
     pages = (db.keys() if '--all' in ui else [i for i in ui.arguments])
     for page in pages:
         msgr.message('rendering page: {0}'.format(page), 1)
@@ -98,13 +107,16 @@ elif str(ui) == 'render':
             if '--no-print' not in ui: msgr.message(rendered, 0)
         else: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
 elif str(ui) == 'rm':
+    """This mode is used to remove pages from database.
+    """
     page_id = ''
     if ui.arguments: page_id = ui.arguments[0]
     if '--page-id' in ui: page_id = ui.get('-p')
     if not page_id:
         msgr.message('fail: page id is required')
         exit(1)
-    msgr.message('removing page {0}'.format(page_id))
+    msgr.message('removing page {0}'.format(page_id), 1)
+    warnings.warn('IMPLEMENT ME!')
 
 
 # Storing widely used objects state

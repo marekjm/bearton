@@ -53,6 +53,11 @@
             "long": "from-file",
             "arguments": ["str"],
             "help": "read page ids - newline separated - from file"
+        },
+        {
+            "short": "r",
+            "long": "render",
+            "help": "re-render the page after editing"
         }
     ],
     "rm": [
