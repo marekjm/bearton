@@ -28,7 +28,14 @@ class Entry:
                 }
         loaded = json.loads(util.readfile(os.path.join(epath, 'meta.json')))
         self._meta = util.dictmerge(meta, loaded, removals=False)
-        self._context = json.loads(util.readfile(os.path.join(epath, 'context.json')))
+        try:
+            self._context = json.loads(util.readfile(os.path.join(epath, 'context.json')))
+            err = None
+        except ValueError as e:
+            err = e
+        finally:
+            if err is not None:
+                raise type(err)('error while loading context: "{0}": {1}'.format(os.path.join(epath, 'context.json'), err))
         return self
 
     def _updatemeta(self, schemes):
