@@ -100,8 +100,16 @@ elif str(ui) == 'render':
     """This mode is used to render individua pages, groups of pages or whole sites.
     """
     pages = (db.keys() if '--all' in ui else [i for i in ui.arguments])
+    if '--type' in ui: pages = db.query(scheme=config.get('scheme'), element=ui.get('-t'))
+    existing = db.keys()
     for page in pages:
-        msgr.message('rendering page: {0}'.format(page), 1)
+        if page not in existing:
+            msgr.message('fail: page "{0}" does not exist'.format(page), 0)
+            if page in bearton.schemes.inspector.lselements(scheme=config.get('scheme')):
+                msgr.message('note: string "{0}" is a name of an element in currently used scheme: try \'bearton-db query {0}\' command to obtain IDs of pages created using it'.format(page), 1)
+            continue
+        else:
+            msgr.message('rendering page: {0}'.format(page), 1)
         if '--check' in ui:
             rendered = bearton.page.builder.render(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
             if '--no-print' not in ui: msgr.message(rendered, 0)
