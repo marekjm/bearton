@@ -82,8 +82,10 @@
             "help": "build all pages (a rebuilt of the site)"
         },
         {
-            "short": "n",
-            "long": "all-new",
+            "short": "t",
+            "long": "type",
+            "arguments": ["str"],
+            "conflicts": ["--all"],
             "help": "build all new pages"
         },
         {
