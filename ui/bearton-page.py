@@ -112,9 +112,9 @@ elif str(ui) == 'render':
             continue
         else:
             msgr.message('rendering page: {0}'.format(page), 1)
-        if '--check' in ui:
+        if '--dry-run' in ui:
             rendered = bearton.page.builder.render(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
-            if '--no-print' not in ui: msgr.message(rendered, 0)
+            if '--print' in ui: msgr.message(rendered, 0)
         else: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
 elif str(ui) == 'rm':
     """This mode is used to remove pages from database.
