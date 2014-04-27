@@ -20,7 +20,8 @@ Ever-up-to-date list of keys can be found in source code of Bearton.
     },
     "output": "index.html",
     "singular": true,
-    "base": false
+    "base": false,
+    "bare": false
 }
 ```
 
@@ -104,9 +105,18 @@ contains data that may be specific for each distribution of the scheme - e.g. me
 Such elements can be created with `bearton page new` command and are placed in a database directory separate from
 ordinary pages.
 
+If field `base` is true, it also implies that `singular` is true.
+
 ----
 
 **`singular`**
 
 If set to true, only one such element can be created -- commands to create another such element will fail.
-Singular specifier has effects only on buildable elements because only they can create entries in database.
+Singular specifier has effects only on buildable elements, **base and bare elements are always singular**.
+
+----
+
+**`bare`**
+
+If `bare` is true, this means it is a meta-template and is only used as a shell for other elements.
+Bare elements cannot be instantiated in database.
