@@ -68,6 +68,10 @@ if str(ui) == 'new':
         if element_meta['singular'] and len(db.query(scheme, element)) > 0:
             msgr.message('failed to create element {0}: element is singular'.format(element), 0)
             exit(1)
+    if 'bare' in element_meta:
+        if element_meta['bare']:
+            msgr.message('fatal: cannot create db entry for bare element: {0}'.format(element), 0)
+            exit(1)
 
     # Debugging info
     msgr.debug('using scheme path: {0}'.format(SCHEMES_PATH))

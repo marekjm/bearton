@@ -25,9 +25,11 @@ class Entry:
                 'output': '',
                 'singular': True,
                 'base': False,
+                'bare': False
                 }
         loaded = json.loads(util.readfile(os.path.join(epath, 'meta.json')))
         self._meta = util.dictmerge(meta, loaded, removals=False)
+        if self._meta['bare'] or self._meta['base']: self._meta['singular'] = True
         try:
             self._context = json.loads(util.readfile(os.path.join(epath, 'context.json')))
             err = None
