@@ -13,7 +13,7 @@ from .. import schemes
 
 def gathercontexts(path, pagepath, msgr, what='base'):
     pagemeta = json.loads(util.readfile(os.path.join(pagepath, 'meta.json')))
-    msgr.debug('directly required contexts: {0}'.format(pagemeta['requires'][what]))
+    msgr.debug('directly required contexts ({1}): {0}'.format(pagemeta['requires'][what], what))
     gathered = pagemeta['requires'][what][:]
     for c in gathered:
         if c[0] == '#':
@@ -21,7 +21,7 @@ def gathercontexts(path, pagepath, msgr, what='base'):
         else:
             required = schemes.inspector.getMeta(pagemeta['scheme'], c)['requires'][what]
         gathered.extend([el for el in required if el not in gathered])
-    msgr.debug('resolved required contexts: {0}'.format(gathered))
+    msgr.debug('resolved required contexts ({1}): {0}'.format(gathered, what))
     return gathered
 
 def loadcontexts(path, schemes, scheme, context, required, msgr):
