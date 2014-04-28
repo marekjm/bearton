@@ -184,8 +184,8 @@ class Database:
         subdb = {}
         for key, entry in self._db.items():
             if not scheme and not element: continue
-            mscheme = (scheme == entry._meta['scheme'] if scheme else True)
-            melem = (element == entry._meta['name'] if element else True)
+            mscheme = (scheme == entry._meta['scheme'] if scheme and 'scheme' in entry._meta else True)
+            melem = (element == entry._meta['name'] if element  and 'name' in entry._meta else True)
             if mscheme and melem: subdb[key] = entry
         pool = []
         for key, entry in subdb.items():
