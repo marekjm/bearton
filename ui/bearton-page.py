@@ -46,9 +46,25 @@ if str(ui) == 'new':
     if '--scheme' in ui: scheme = ui.get('-s')
     if '--element' in ui: element = ui.get('-e')
 
-    if not element:
-        msgr.debug('cannot define what element to use')
-        msgr.message('fatal: element required', 0)
+    fail = False
+    if not element: fail = True
+
+    els = bearton.schemes.inspector.lselements(scheme=config.get('scheme'))
+    if element not in els and element != "":
+        candidates = []
+        for i in els:
+            if i.startswith(element): candidates.append(i)
+        if len(candidates) > 1:
+            msgr.debug('"{0}" is ambigious: resolves to more than one element'.format(element))
+            fail = True
+        elif len(candidates) < 1:
+            msgr.debug('"{0}" does not resolve to any element'.format(element))
+            fail = True
+        else:
+            msgr.debug('"{0}" resolved to: {1}'.format(element, candidates[0]))
+            element = candidates.pop(0)
+    if fail:
+        msgr.message('fatal: cannot define what element to use')
         exit(1)
 
     # Performing necessary checks
@@ -66,7 +82,7 @@ if str(ui) == 'new':
         exit(1)
     if 'singular' in element_meta:
         if element_meta['singular'] and len(db.query(scheme, element)) > 0:
-            msgr.message('failed to create element {0}: element is singular'.format(element), 0)
+            msgr.message('failed to create new element of type "{0}": element is singular'.format(element), 0)
             exit(1)
     if 'bare' in element_meta:
         if element_meta['bare']:
