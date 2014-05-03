@@ -78,6 +78,10 @@ elif str(ui) == 'update':
             if '--context-edits-log' in ui: log = ui.get('--context-edits-log')
             bearton.util.writefile(log, '\n'.join(contexts))
             msgr.message('entries that possibly - in case something was added - require context edits were placed in "{0}" file'.format(log), 0)
+else:
+    if '--version' in ui: msgr.message(('bearton version {0}' if '--verbose' in ui else '{0}').format(bearton.__version__), 0)
+    if '--help' in ui:
+        print('\n'.join(clap.helper.Helper(ui).help()))
 
 
 # Storing widely used objects state

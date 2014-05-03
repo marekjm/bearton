@@ -67,6 +67,10 @@ elif str(ui) == 'sync':
         msgr.debug('available schemes: {0}'.format(', '.join(available_schemes)))
         msgr.message('schemes to update: {0}'.format(', '.join(to_update)), 0)
         bearton.init.syncschemes(target=current_schemes_path, schemes=SCHEMES_PATH, wanted=to_update, msgr=msgr)
+else:
+    if '--version' in ui: msgr.message(('bearton version {0}' if '--verbose' in ui else '{0}').format(bearton.__version__), 0)
+    if '--help' in ui:
+        print('\n'.join(clap.helper.Helper(ui).help()))
 
 
 # Storing widely used objects state

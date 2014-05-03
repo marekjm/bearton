@@ -41,6 +41,8 @@ config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 # -----------------------------
 if str(ui) == '':
     if '--version' in ui: msgr.message(('bearton version {0}' if '--verbose' in ui else '{0}').format(bearton.__version__), 0)
+    if '--help' in ui:
+        print('\n'.join(clap.helper.Helper(ui).help()))
 
 
 # Storing widely used objects state

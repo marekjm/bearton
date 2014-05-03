@@ -75,6 +75,11 @@ elif str(ui) == 'rm':
         msgr.message(config.pop(keys[0]), 0)
     else:
         for k in keys: config.remove(k)
+else:
+    if '--version' in ui: msgr.message(('bearton version {0}' if '--verbose' in ui else '{0}').format(bearton.__version__), 0)
+    if '--help' in ui:
+        print('\n'.join(clap.helper.Helper(ui).help()))
+
 
 
 # Storing widely used objects state
