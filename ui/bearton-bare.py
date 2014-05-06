@@ -5,6 +5,7 @@ import os
 from sys import argv
 
 import clap
+import muspyche
 
 import bearton
 
@@ -40,7 +41,10 @@ config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 #   UI logic code goes HERE!  |
 # -----------------------------
 if str(ui) == '':
-    if '--version' in ui: msgr.message(('bearton version {0}' if '--verbose' in ui else '{0}').format(bearton.__version__), 0)
+    if '--version' in ui:
+        msgr.message(('bearton version {0}' if '--verbose' in ui else '{0}').format(bearton.__version__), 0)
+        for name, module in [('clap', clap), ('muspyche', muspyche)]:
+            msgr.debug('using "{0}" library v. {1}'.format(name, module.__version__))
     if '--help' in ui:
         print('\n'.join(clap.helper.Helper(ui).help()))
 
