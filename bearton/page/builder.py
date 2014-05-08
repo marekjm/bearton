@@ -70,7 +70,7 @@ def render(path, schemes, page, msgr):
     template = os.path.join(schemes, meta['scheme'], 'elements', meta['name'], 'template.mustache')
     msgr.debug('reading template: {0}'.format(template))
     template = util.readfile(template)
-    return muspyche.api.make(template, context, lookup=[os.path.join(schemes, meta['scheme'], 'elements')])
+    return muspyche.api.make(template, context, lookup=[os.path.join(schemes, meta['scheme'], 'elements'), pagepath])
 
 def build(path, schemes, page, msgr):
     meta = json.loads(util.readfile(os.path.join(path, '.bearton', 'db', 'pages', page, 'meta.json')))
