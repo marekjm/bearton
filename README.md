@@ -35,13 +35,24 @@ is a must-have for Bearton since it uses multiple contexts to render its Mustach
 **Software required to work with Bearton:**
 
 - Python 3.x (Python from 2.x line won't work),
-- Muspyche library,
-- webserver (e.g. nginx),
+- Muspyche library (https://github.com/marekjm/muspyche),
+
+**Optional dependencies**
+
+Optional dependencies may be installed.
+If they are, Bearton will detect them at runtime and will adjust its functionality accordingly.
+
+*For Markdown support*
+
+- Markdown 2 (https://github.com/trentm/python-markdown2),
+- Python Markdown (https://pypi.python.org/pypi/Markdown),
+
+----
 
 Everything is kept on user machine - only generated HTML and reuired assets have to be sent
 to the remote server.  
 This provides users with the ability to work while being offline, and upload the results of work
-when the connection becames available.
+when the connection becomes available.
 
 ----
 
