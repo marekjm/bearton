@@ -144,7 +144,7 @@ class Database:
         return iter([self._db[key] for key in self._db])
 
     def _readdb(self):
-        entries = os.listdir(self._path)
+        entries = (os.listdir(self._path) if os.path.isdir(self._path) else [])
         entries = [(entry, Entry(self._path, entry).load()) for entry in entries]
         return dict(entries)
 
@@ -153,7 +153,8 @@ class Database:
         return self
 
     def store(self):
-        for entry in self: entry.store()
+        if self._db is not None:
+            for entry in self: entry.store()
         return self
 
     def unload(self):
