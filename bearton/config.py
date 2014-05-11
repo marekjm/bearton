@@ -8,13 +8,13 @@ from .exceptions import *
 class Configuration:
     """Class implementing interface to Bearton site configuration.
     """
-    # class variable, so when one copy of configuratin is loaded as guarded all become
-    # the instance that set config to guarded stance becomes a guard and only it can unguard the config (by calling .unload())
+    # Class variables, so when one copy of configuration is loaded as guarded all become so.
+    # The instance that set config to guarded state becomes the guardian and only it can unguard the config (by calling .unload())
     _guarded, _guard = False, None
 
     def __init__(self, path='.'):
         self._path = path
-        self._conf = {}
+        self._conf = None
 
     def __contains__(self, key):
         return key in self._conf
@@ -30,26 +30,25 @@ class Configuration:
 
     def _getpath(self):
         """Tries to find a path to config JSON file.
+        If path has not been found, returns None.
         """
         base, path = os.path.abspath(self._path), ''
         while True and os.path.split(base)[1] != '':
             path = os.path.join(base, '.bearton', 'config.json')
             if os.path.isfile(path): break
             base, path = os.path.split(base)[0], ''
-        if not path:
-            raise BeartonError('cannot find Bearton configuration file: start directory: {0}'.format(os.path.abspath(self._path)))
-        else:
-            return path
+        if not path: path = None
+        return path
 
     def load(self, guard=False):
         """Loads configuration file.
-        If `guard` is true, it will guard the file from being written; the runtime copy may be modified at will however.
+        If `guard` is true, it will guard the file from being written; the runtime copy may be modified at will though.
         """
-        if Configuration._guarded is not True:
+        if Configuration._guarded is not True and guard:
             Configuration._guarded = guard
             Configuration._guard = self
         self._path = self._getpath()
-        conf = json.loads(util.readfile(self._path))
+        conf = (json.loads(util.readfile(self._path)) if self._path is not None else None)
         if conf is not None: self._conf = conf
         else: self.default()
         return self
@@ -70,7 +69,7 @@ class Configuration:
         """Stores configration file and
         writes any changes made.
         """
-        if Configuration._guarded is not True: util.writefile(path=self._path, s=json.dumps(self._conf))
+        if Configuration._guarded is not True and self._conf is not None: util.writefile(path=self._path, s=json.dumps(self._conf))
         return self
 
     def get(self, key):
