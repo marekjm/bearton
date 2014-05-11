@@ -117,10 +117,15 @@ class Entry:
         return s
 
     def store(self):
+        """Stores entry in the database.
+        """
         epath = os.path.join(self._path, self._entry)
         if self._changed:
             util.writefile(os.path.join(epath, 'meta.json'), json.dumps(self._meta), encoding=None)
             util.writefile(os.path.join(epath, 'context.json'), json.dumps(self._context), encoding=None)
+        for d in ['markdown']:
+            path = os.path.join(epath, d)
+            if not os.path.isdir(path): os.mkdir(path)
         self._changed = False
 
     def remove(self):
