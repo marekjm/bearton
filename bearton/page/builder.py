@@ -5,6 +5,18 @@ import warnings
 
 import muspyche
 
+try:
+    import markdown2 as markdown
+except ImportError:
+    try:
+        import markdown # try different library
+    except ImportError:
+        markdown = None  # no Markdown support
+    finally:
+        pass
+finally:
+    pass
+
 from .. import util
 from .. import config
 from .. import db
@@ -56,7 +68,7 @@ def loadbasecontexts(path, schemes, scheme, context, required, msgr):
             context[k] = v
     return context
 
-def render(path, schemes, page, msgr):
+def _getstuff(path, schemes, page, msgr):
     path = os.path.abspath(path)
     dbpath = os.path.join(path, '.bearton', 'db', 'pages')
     pagepath = os.path.join(dbpath, page)
@@ -70,7 +82,19 @@ def render(path, schemes, page, msgr):
     template = os.path.join(schemes, meta['scheme'], 'elements', meta['name'], 'template.mustache')
     msgr.debug('reading template: {0}'.format(template))
     template = util.readfile(template)
-    return muspyche.api.make(template, context, lookup=[os.path.join(schemes, meta['scheme'], 'elements'), pagepath])
+    return (meta, context, template)
+
+def render(path, schemes, page, msgr):
+    meta, context, template = _getstuff(path, schemes, page, msgr)
+    lookup = [os.path.join(schemes, meta['scheme'], 'elements'), os.path.join(path, '.bearton', 'db', 'pages', page)]
+    parsed = muspyche.parser.parse(template, lookup)
+    context = muspyche.context.ContextStack(context)
+    renderer = muspyche.renderer.Renderer(parsed, context, lookup)
+    if markdown is not None:
+        # apply Markdown post-renderer for out-of-the-box Markdown support for
+        # Markdown partials (e.g. articles)
+        renderer.addpost('^markdown/', markdown.markdown)
+    return renderer.render()
 
 def build(path, schemes, page, msgr):
     meta = json.loads(util.readfile(os.path.join(path, '.bearton', 'db', 'pages', page, 'meta.json')))
