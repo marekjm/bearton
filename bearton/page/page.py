@@ -15,9 +15,10 @@ def new(path, schemes_path, scheme, element, msgr):
     hashpath = os.path.join(path, '.bearton', 'db', 'pages', hashed)
     msgr.debug('creating databse entry: {0}'.format(hashpath))
     os.mkdir(hashpath)
-    files = ['meta', 'context', 'hints']
     element_path = os.path.join(schemes_path, scheme, 'elements', element)
-    for f in files:
+    for d in ['markdown']:
+        os.mkdir(os.path.join(hashpath, d))
+    for f in ['meta', 'context', 'hints']:
         f += '.json'
         msgr.debug('copying {0}'.format(f), keep=True)
         msgr.onok(msg='\tOK').onfail(msg='\tFAIL: {:error_msg}')
