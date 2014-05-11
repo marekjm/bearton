@@ -24,8 +24,8 @@ ui.parse()
 
 
 # Setting constants for later use
-SITE_PATH = (ui.get('-t') if '--target' in ui else '.')
-SITE_DB_PATH = os.path.join(SITE_PATH, '.bearton', 'db')
+TARGET = os.path.abspath(ui.get('-t') if '--target' in ui else '.')
+SITE_PATH = bearton.util.getrepopath(TARGET)
 SCHEMES_PATH = (ui.get('-S') if '--schemes' in ui else bearton.util.getschemespath(cwd=SITE_PATH))
 
 
@@ -35,7 +35,7 @@ db = bearton.db.db(path=SITE_PATH).load()
 config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 
 
-if str(ui) == 'apply':
+if bearton.util.inrepo(path=TARGET) and str(ui) == 'apply':
     name = ''
     if 'scheme' in config: name = config.get('scheme')
     if ui.arguments: name= ui.arguments[0]
@@ -53,13 +53,13 @@ if str(ui) == 'apply':
 
     if '--force' in ui: bearton.schemes.loader.rm(os.path.join(SCHEMES_PATH, name), SITE_PATH, msgr)
     bearton.schemes.loader.apply(os.path.join(SCHEMES_PATH, name), SITE_PATH, msgr)
-elif str(ui) == 'rm':
+elif bearton.util.inrepo(path=TARGET) and str(ui) == 'rm':
     name = (config.get('scheme') if 'scheme' in config else '')
     if not name:
         msgr.message('fatal: cannot define name of the scheme to remove')
         exit(1)
     bearton.schemes.loader.rm(os.path.join(SCHEMES_PATH, name), SITE_PATH, msgr)
-elif str(ui) == 'inspect':
+elif bearton.util.inrepo(path=TARGET) and str(ui) == 'inspect':
     name = (config.get('scheme') if 'scheme' in config else '')
     if not name:
         msgr.message('fatal: cannot define name of the scheme to remove')
@@ -83,10 +83,14 @@ elif str(ui) == 'inspect':
             els = f[:]
         output = str([name for name, meta in els])
         msgr.message(output, 0)
-else:
+elif str(ui) == '':
     if '--version' in ui: msgr.message(('bearton version {0}' if '--verbose' in ui else '{0}').format(bearton.__version__), 0)
     if '--help' in ui:
         print('\n'.join(clap.helper.Helper(ui).help()))
+else:
+    try: bearton.util.inrepo(path=TARGET, panic=True)
+    except bearton.exceptions.BeartonError as e: msgr.message('fatal: {0}'.format(e))
+    finally: pass
 
 
 # Storing widely used objects state

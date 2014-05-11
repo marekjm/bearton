@@ -25,8 +25,8 @@ ui.parse()
 
 
 # Setting constants for later use
-SITE_PATH = (ui.get('-t') if '--target' in ui else '.')
-SITE_DB_PATH = os.path.join(SITE_PATH, '.bearton', 'db')
+TARGET = os.path.abspath(ui.get('-t') if '--target' in ui else '.')
+SITE_PATH = bearton.util.getrepopath(TARGET)
 SCHEMES_PATH = (ui.get('-S') if '--schemes' in ui else bearton.util.getschemespath(cwd=SITE_PATH))
 
 
@@ -36,7 +36,7 @@ db = bearton.db.db(path=SITE_PATH).load()
 config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 
 
-if str(ui) == 'new':
+if bearton.util.inrepo(path=TARGET) and str(ui) == 'new':
     """This mode is employed for creating new pages.
     """
     # Obtaining scheme and element
@@ -77,7 +77,7 @@ if str(ui) == 'new':
         if element_meta['base'] == False or 'base' not in element_meta:
             msgr.message('fatal: cannot add page as a base element', 0)
             exit(1)
-    if '--base' in ui and element in os.listdir(os.path.join(SITE_DB_PATH, 'base')):
+    if '--base' in ui and element in os.listdir(os.path.join(SITE_PATH, '.bearton', 'db', 'base')):
         msgr.message('fatal: base element \'{0}\' already created: try \'bearton page edit -bp {0}\' command'.format(element), 0)
         exit(1)
     if 'singular' in element_meta:
@@ -101,7 +101,7 @@ if str(ui) == 'new':
     if '--edit' in ui: bearton.page.page.edit(path=SITE_PATH, page=hashed, base=('--base' in ui), msgr=msgr)
     else: msgr.message(hashed, 0)
     if '--render' in ui: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=hashed, msgr=msgr)
-elif str(ui) == 'edit':
+elif bearton.util.inrepo(path=TARGET) and str(ui) == 'edit':
     """This mode is employed for editing existing pages.
     """
     page_id = ''
@@ -112,17 +112,37 @@ elif str(ui) == 'edit':
         exit(1)
 
     ids = ([l.strip() for l in bearton.util.readfile(ui.get('--from-file')).split('\n')] if '-F' in ui else [page_id])
-    for i in ids:
-        bearton.page.page.edit(SITE_PATH, i, ('--base' in ui), msgr)
+    for i, id in enumerate(ids):
+        if id not in db.keys():
+            candidates = [k for k in db.keys() if k.startswith(id)]
+            if len(candidates) > 1:
+                msgr.message('fail: id "{0}" resolves to more than one element'.format(id))
+            elif len(candidates) == 0:
+                msgr.message('fail: id "{0}" does not resolve to any element'.format(id))
+            else:
+                id = candidates.pop(0)
+                ids[i] = id
+        if id in db.keys():
+            bearton.page.page.edit(SITE_PATH, id, ('--base' in ui), msgr)
+        else:
+            msgr.message('fail: there is no such page as {0}'.format(id))
     if '--render' in ui:
         for i in ids: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=i, msgr=msgr)
-elif str(ui) == 'render':
+elif bearton.util.inrepo(path=TARGET) and str(ui) == 'render':
     """This mode is used to render individua pages, groups of pages or whole sites.
     """
     pages = (db.keys() if '--all' in ui else [i for i in ui.arguments])
     if '--type' in ui: pages = [key for key, entry in db.query(scheme=config.get('scheme'), element=ui.get('-t'))]
     existing = db.keys()
     for page in pages:
+        if page not in db.keys():
+            candidates = [k for k in db.keys() if k.startswith(page)]
+            if len(candidates) > 1:
+                msgr.message('fail: id "{0}" resolves to more than one element'.format(id))
+            elif len(candidates) == 0:
+                msgr.message('fail: id "{0}" does not resolve to any element'.format(id))
+            else:
+                page = candidates.pop(0)
         if page not in existing:
             msgr.message('fail: page "{0}" does not exist'.format(page), 0)
             if page in bearton.schemes.inspector.lselements(scheme=config.get('scheme')):
@@ -136,7 +156,7 @@ elif str(ui) == 'render':
             rendered = bearton.page.builder.render(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
             if '--print' in ui: msgr.message(rendered, 0)
         else: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
-elif str(ui) == 'rm':
+elif bearton.util.inrepo(path=TARGET) and str(ui) == 'rm':
     """This mode is used to remove pages from database.
     """
     page_id = ''
@@ -147,11 +167,14 @@ elif str(ui) == 'rm':
         exit(1)
     msgr.message('removing page {0}'.format(page_id), 1)
     warnings.warn('IMPLEMENT ME!')
-else:
+elif str(ui) == '':
     if '--version' in ui: msgr.message(('bearton version {0}' if '--verbose' in ui else '{0}').format(bearton.__version__), 0)
     if '--help' in ui:
         print('\n'.join(clap.helper.Helper(ui).help()))
-
+else:
+    try: bearton.util.inrepo(path=TARGET, panic=True)
+    except bearton.exceptions.BeartonError as e: msgr.message('fatal: {0}'.format(e))
+    finally: pass
 
 # Storing widely used objects state
 config.store().unload()

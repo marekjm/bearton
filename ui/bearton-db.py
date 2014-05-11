@@ -24,8 +24,8 @@ ui.parse()
 
 
 # Setting constants for later use
-SITE_PATH = (ui.get('-t') if '--target' in ui else '.')
-SITE_DB_PATH = os.path.join(SITE_PATH, '.bearton', 'db')
+TARGET = os.path.abspath(ui.get('-t') if '--target' in ui else '.')
+SITE_PATH = bearton.util.getrepopath(TARGET)
 SCHEMES_PATH = (ui.get('-S') if '--schemes' in ui else bearton.util.getschemespath(cwd=SITE_PATH))
 
 
@@ -35,7 +35,7 @@ db = bearton.db.db(path=SITE_PATH).load()
 config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 
 
-if str(ui) == 'query':
+if bearton.util.inrepo(path=TARGET) and str(ui) == 'query':
     if '--raw' in ui:
         scheme, element, queryd, querytags = db._parsequery(ui.get('-r'))
     else:
@@ -60,7 +60,7 @@ if str(ui) == 'query':
     else: signature = '{:key@}'
     if '--with-output' in ui: signature += ' {:output@meta}'
     for i in pages: msgr.message(db.get(i).getsignature(signature), 0)
-elif str(ui) == 'update':
+elif bearton.util.inrepo(path=TARGET) and str(ui) == 'update':
     if '--wipe' in ui:
         really = ('yes' if '--yes' in ui else input('do you really want to wipe out the database? [y/n] '))
         really = (True if really.strip().lower() in ['y', 'yes'] else False)
@@ -68,7 +68,7 @@ elif str(ui) == 'update':
             msgr.debug('cancelled database wipeout')
         else:
             db.wipe()
-            msgr.debug('wiped database contents from: {0}'.format(SITE_DB_PATH))
+            msgr.debug('wiped database contents from: {0}'.format(os.path.join(SITE_PATH, '.bearton', 'db')))
     else:
         metadata, contexts = db.update(SCHEMES_PATH)
         for name, value in [('metadata', metadata), ('context', contexts)]:
@@ -78,10 +78,14 @@ elif str(ui) == 'update':
             if '--context-edits-log' in ui: log = ui.get('--context-edits-log')
             bearton.util.writefile(log, '\n'.join(contexts))
             msgr.message('entries that possibly - in case something was added - require context edits were placed in "{0}" file'.format(log), 0)
-else:
+elif str(ui) == '':
     if '--version' in ui: msgr.message(('bearton version {0}' if '--verbose' in ui else '{0}').format(bearton.__version__), 0)
     if '--help' in ui:
         print('\n'.join(clap.helper.Helper(ui).help()))
+else:
+    try: bearton.util.inrepo(path=TARGET, panic=True)
+    except bearton.exceptions.BeartonError as e: msgr.message('fatal: {0}'.format(e))
+    finally: pass
 
 
 # Storing widely used objects state

@@ -25,8 +25,8 @@ ui.parse()
 
 
 # Setting constants for later use
-SITE_PATH = (ui.get('-t') if '--target' in ui else '.')
-SITE_DB_PATH = os.path.join(SITE_PATH, '.bearton', 'db')
+TARGET = (ui.get('-t') if '--target' in ui else '.')
+SITE_PATH = bearton.util.getrepopath(TARGET)
 SCHEMES_PATH = (ui.get('-S') if '--schemes' in ui else bearton.util.getschemespath(cwd=SITE_PATH))
 
 
@@ -47,6 +47,10 @@ if str(ui) == '':
             msgr.debug('using "{0}" library v. {1}'.format(name, module.__version__))
     if '--help' in ui:
         msgr.message('\n'.join(clap.helper.Helper(ui).help()))
+else:
+    try: bearton.util.inrepo(path=TARGET, panic=True)
+    except bearton.exceptions.BeartonError as e: msgr.message('fatal: {0}'.format(e))
+    finally: pass
 
 
 # Storing widely used objects state

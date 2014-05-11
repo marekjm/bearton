@@ -24,8 +24,8 @@ ui.parse()
 
 
 # Setting constants for later use
-SITE_PATH = (ui.get('-t') if '--target' in ui else '.')
-SITE_DB_PATH = os.path.join(SITE_PATH, '.bearton', 'db')
+TARGET = os.path.abspath(ui.get('-t') if '--target' in ui else '.')
+SITE_PATH = bearton.util.getrepopath(TARGET)
 SCHEMES_PATH = (ui.get('-S') if '--schemes' in ui else bearton.util.getschemespath(cwd=SITE_PATH))
 
 
@@ -35,7 +35,7 @@ db = bearton.db.db(path=SITE_PATH).load()
 config = bearton.config.Configuration(path=SITE_PATH).load()
 
 
-if str(ui) == 'get':
+if bearton.util.inrepo(path=TARGET) and str(ui) == 'get':
     if '--list' in ui:
         if '--verbose' in ui:
             output = dict(config.kvalues())
@@ -59,7 +59,7 @@ if str(ui) == 'get':
         output = config.get(ui.arguments[0])
         if '--json' in ui: output = json.dumps(output)
         msgr.message(output, 0)
-elif str(ui) == 'set':
+elif bearton.util.inrepo(path=TARGET) and str(ui) == 'set':
     key, value = '', ''
     if ui.arguments: key = ui.arguments.pop(0)
     if ui.arguments: value = ui.arguments.pop(0)
@@ -67,7 +67,7 @@ elif str(ui) == 'set':
     if '--value' in ui: value = ui.get('-v')
     msgr.debug('{0} -> {1}'.format(key, value))
     config.set(key, value)
-elif str(ui) == 'rm':
+elif bearton.util.inrepo(path=TARGET) and str(ui) == 'rm':
     keys = []
     if ui.arguments: keys = [k for k in ui.arguments]
     if '--key' in ui: keys = [ui.get('-k')]
@@ -75,7 +75,7 @@ elif str(ui) == 'rm':
         msgr.message(config.pop(keys[0]), 0)
     else:
         for k in keys: config.remove(k)
-else:
+elif str(ui) == '':
     if '--version' in ui: msgr.message(('bearton version {0}' if '--verbose' in ui else '{0}').format(bearton.__version__), 0)
     if '--help' in ui:
         print('\n'.join(clap.helper.Helper(ui).help()))
