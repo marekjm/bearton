@@ -1,9 +1,20 @@
 {
     "init": [
         {
-            "short": "f",
-            "long": "force",
-            "help": "write even if directories are already present (e.g. when reinitializing)"
+            "short": "c",
+            "long": "clean",
+            "help": "erase Bearton repo before initializing (e.g. when reinitializing)"
+        },
+        {
+            "short": "u",
+            "long": "update",
+            "conflicts": ["--clean"],
+            "help": "update Bearton repository structure"
+        },
+        {
+            "long": "no-write",
+            "requires": ["--clean"],
+            "help": "prevents directories and config files from being written, using 'bearton-init init --clean --no-write' is equivalent of removing the repo"
         },
         {
             "short": "S",

@@ -37,13 +37,17 @@ config = bearton.config.Configuration(path=SITE_PATH)
 
 if str(ui) == 'init':
     path = os.path.abspath(SITE_PATH)
-    if '--force' in ui:
-        msgr.debug('forcing initialization')
+    if '--clean' in ui:
+        msgr.debug('cleaning')
         bearton.init.rm(path, msgr)
-    bearton.init.new(target=path, schemes=SCHEMES_PATH, msgr=msgr)
-    db.load()
-    config.load()
-    msgr.message('initialized Bearton local in {0}'.format(path), 0)
+    if '--no-write' not in ui:
+        if '--update' in ui:
+            bearton.init.update(target=path, msgr=msgr)
+        else:
+            bearton.init.new(target=path, schemes=SCHEMES_PATH, msgr=msgr)
+        db.load()
+        config.load()
+        msgr.message('{0} Bearton local in {1}'.format(('updated' if '--update' in ui else 'initialized'), path), 1)
 elif str(ui) == 'rm':
     target = (ui.get('-t') if '--target' in ui else '.')
     target = os.path.abspath(target)
