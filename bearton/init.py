@@ -17,13 +17,15 @@ def _newdirs(target, msgr):
             ('.bearton', 'db'),
             ('.bearton', 'db', 'pages'),
             ('.bearton', 'db', 'base'),
+            ('.bearton', 'tmp'),
             ('assets',),
             ('data',),
             ]
     for parts in dirs:
         path = os.path.join(target, *parts)
-        os.mkdir(path)
-        msgr.debug('creating: {0}'.format(path))
+        if not os.path.isdir(path):
+            os.mkdir(path)
+            msgr.debug('creating: {0}'.format(path))
 
 def _newconf(target, msgr):
     """Create empty config file.
@@ -44,6 +46,11 @@ def new(target, schemes='', msgr=None):
     _newdirs(target, msgr)
     _newconf(target, msgr)
     if schemes: _copyschemes(target, schemes, msgr)
+
+def update(target, msgr):
+    """Updates Bearton repository, e.g. creates new directories required by more recent version of Bearton suite.
+    """
+    _newdirs(target, msgr)
 
 def rm(target, msgr):
     for part in ['assets', 'data']:
