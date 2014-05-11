@@ -49,6 +49,7 @@ def install():
     shutil.copytree('./schemes', schemes_path)
 
     ui_path = os.path.join(share_path, 'ui')
+    print('installing ui descriptions in:', ui_path)
     if not os.path.isdir(ui_path): os.mkdir(ui_path)
     uis = glob.glob('./ui/*.json')
     width = 0
@@ -58,7 +59,7 @@ def install():
     width += 4
     for f in uis:
         source = f
-        target = os.path.join(share_path, f)
+        target = os.path.normpath(os.path.join(share_path, f))
         print('cp:', source.ljust(width), '->', target)
         shutil.copy(source, target)
 
