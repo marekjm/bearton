@@ -7,6 +7,17 @@ import re
 import sys
 import time
 
+try:
+    import readline
+except ImportError:
+    # These are not the modules you're looking for... Move along.
+    # Meh, we're probably on Windows...
+    pass
+finally:
+    pass
+
+from . import exceptions
+
 
 class Messenger:
     """Object used to write messages to stream-like objects.
@@ -181,3 +192,21 @@ def getuipath(cwd=''):
             path = os.path.join(*p)
             break
     return path
+
+def getrepopath(path='.'):
+    """Returns path to the bearton repo or empty string if path cannot be found.
+    """
+    base, path = os.path.abspath(path), ''
+    while os.path.split(base)[1] != '':
+        path = base[:]
+        if os.path.isdir(os.path.join(base, '.bearton')): break
+        base, path = os.path.split(base)[0], ''
+    return path
+
+def inrepo(path='.', panic=False):
+    """Returns true if given directory can be used as by Bearton as repository, false otherwise.
+    If `panic` parameter is true, will raise exception with appropriate message.
+    """
+    usable = getrepopath(path) != ''
+    if not usable and panic: raise exceptions.BeartonError('"{0}" is not a bearton repository (and no parent is)'.format(os.path.abspath(path)))
+    return usable
