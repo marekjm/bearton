@@ -62,7 +62,7 @@ def rm(target, msgr):
     msgr.debug('possible Bearton repo in: {0} ({1})'.format(path, os.path.isdir(path)))
     if os.path.isdir(path):
         shutil.rmtree(path)
-        msgr.message('removed Bearton local from {0}'.format(path), 0)
+        msgr.message('removed Bearton local from {0}'.format(path), 1)
 
 def syncschemes(target, schemes, wanted, msgr):
     for w in wanted:
