@@ -85,9 +85,20 @@ bearton-page new -e foo -s bar
 
 ### More options
 
-There are two more options to use when creating the page.
+There are two more options to use when creating pages.
+
+**`--edit`**
+
+This option is used to automatically launch editor and edit the context of the new page just after it is created in the database.
+
+**`--render`**
+
+This option is used to render the page immediatelly after it is created.
 
 
+Useful command is: `bearton-page new -ER foo`  
+It will create new page of type `foo`, launch editor for its context, and render it after the user finishes editing.
+This provides for instant publishing of new pages.
 
 ----
 
