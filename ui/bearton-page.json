@@ -58,6 +58,12 @@
             "short": "r",
             "long": "render",
             "help": "re-render the page after editing"
+        },
+        {
+            "short": "m",
+            "long": "markdown",
+            "arguments": ["str"],
+            "help": "edit Markdown entry with given <name>"
         }
     ],
     "rm": [

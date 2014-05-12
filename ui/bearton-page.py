@@ -123,7 +123,8 @@ elif bearton.util.inrepo(path=TARGET) and str(ui) == 'edit':
                 id = candidates.pop(0)
                 ids[i] = id
         if id in db.keys():
-            bearton.page.page.edit(SITE_PATH, id, ('--base' in ui), msgr)
+            if '--markdown' in ui: bearton.page.page.editmarkdown(SITE_PATH, id, ui.get('-m'), msgr)
+            else: bearton.page.page.edit(SITE_PATH, id, ('--base' in ui), msgr)
         else:
             msgr.message('fail: there is no such page as {0}'.format(id))
     if '--render' in ui:
