@@ -31,8 +31,8 @@ SCHEMES_PATH = (ui.get('-S') if '--schemes' in ui else bearton.util.getschemespa
 
 # Creating widely used objects
 msgr = bearton.util.Messenger(verbosity=int('--verbose' in ui), debugging=('--debug' in ui), quiet=('--quiet' in ui))
-db = bearton.db.db(path=SITE_PATH)
-config = bearton.config.Configuration(path=SITE_PATH)
+db = bearton.db.db(path=SITE_PATH).load()
+config = bearton.config.Configuration(path=SITE_PATH).load()
 
 
 if str(ui) == 'init':
@@ -48,6 +48,9 @@ if str(ui) == 'init':
         db.load()
         config.load()
         msgr.message('{0} Bearton local in {1}'.format(('updated' if '--update' in ui else 'initialized'), path), 1)
+    if '--clean' in ui and '--no-write' in ui: #equivalent to removal
+        db.unload()
+        config.unload()
 elif str(ui) == 'rm':
     target = (ui.get('-t') if '--target' in ui else '.')
     target = os.path.abspath(target)
