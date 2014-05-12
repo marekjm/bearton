@@ -14,7 +14,7 @@ __pycache__/
 
 
 # Ignore VIM swap files
-*.swp
+*.sw[po]
 
 
 # ----
