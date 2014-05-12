@@ -7,16 +7,10 @@
             "help": "use given scheme to create the page"
         },
         {
-            "short": "S",
-            "long": "schemes",
-            "arguments": ["str"],
-            "help": "look for schemes in this path"
-        },
-        {
             "short": "e",
             "long": "element",
             "arguments": ["str"],
-            "help": "use given element to create the page"
+            "help": "use given element to create the page, even if string does not point to any element Bearton will not try to match it"
         },
         {
             "short": "b",
@@ -76,12 +70,6 @@
         }
     ],
     "render": [
-        {
-            "short": "S",
-            "long": "schemes",
-            "arguments": ["str"],
-            "help": "look for schemes in this path"
-        },
         {
             "short": "a",
             "long": "all",
