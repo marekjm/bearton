@@ -46,10 +46,31 @@ def newbase(path, schemes_path, scheme, element, msgr=None):
         msgr.report()
 
 def edit(path, page, base, msgr):
+    """Launches editor to edit context of given page.
+    """
     path = os.path.abspath(os.path.join(path, '.bearton', 'db', ('base' if base else 'pages'), page, 'context.json'))
     editcmd = '{0} "{1}"'.format(os.getenv('EDITOR', 'vim'), path)
     msgr.debug(editcmd)
     if os.path.isfile(path):
+        ok = True
+        os.system(editcmd)
+    else:
+        ok = False
+    return ok
+
+def editmarkdown(path, page, element, msgr):
+    """Lanuches editor to edit Markdown partials of given page.
+    """
+    base = os.path.abspath(os.path.join(path, '.bearton', 'db', 'pages', page, 'markdown'))
+    path = ''
+    for i in ['{0}', '{0}.markdown']:
+        candidate = os.path.join(base, i.format(element))
+        if os.path.isfile(candidate):
+            path = candidate
+            break
+    editcmd = '{0} "{1}"'.format(os.getenv('EDITOR', 'vim'), path)
+    msgr.debug(editcmd)
+    if path:
         ok = True
         os.system(editcmd)
     else:
