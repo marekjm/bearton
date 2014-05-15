@@ -124,7 +124,7 @@ By default, `bearton-page edit` will edit context of the page(s) with supplied i
 This can be achieved with `--markdown` option.
 
 ```
-bearton-page edit --markdown article de24ad81
+bearton-page edit --markdown article <hash>
 ```
 
 In such case, Bearton will search the `.bearton/db/pages/<hash>/markdown/` directory for:
@@ -140,3 +140,25 @@ When editing, Bearton will use the editor pointed to by `EDITOR` environment var
 ----
 
 ### Rendering pages
+
+Rendering of pages is done with `bearton-page render` mode.
+
+```
+bearton-page render [<hash>...]
+```
+
+This will render page with given ID and write the results to output path specified in meta of the page.
+Partial hashes will be resolved to full IDs.
+
+To render all pages: `bearton-page render --all`  
+To render all pages *of given type*: `bearton-page render --type <type>`
+
+**Testing and dry-running**
+
+```
+bearton-page render --dry-run [--print] <hash>
+```
+
+There is a possibility of dry-run the rendering, i.e. perform all of the steps required to render the page except
+of the write-to-file part. This is enabled by `--dry-run` option.  
+With the `--print` option it is possible to print rendered text to screen (useful for debugging).
