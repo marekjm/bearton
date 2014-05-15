@@ -111,6 +111,9 @@ elif bearton.util.inrepo(path=TARGET) and str(ui) == 'edit':
     """This mode is employed for editing existing pages.
     """
     page_id = ''
+    if len(ui.arguments) > 1:
+        msgr.message('fail: too many operands: expected at most 1 but got {0}'.format(len(ui.arguments)))
+        exit(1)
     if ui.arguments: page_id = ui.arguments[0]
     if '--page-id' in ui: page_id = ui.get('-p')
     if not page_id and '--from-file' not in ui:
@@ -123,8 +126,10 @@ elif bearton.util.inrepo(path=TARGET) and str(ui) == 'edit':
             candidates = [k for k in db.keys() if k.startswith(id)]
             if len(candidates) > 1:
                 msgr.message('fail: id "{0}" resolves to more than one element'.format(id))
+                ids[i] = ''
             elif len(candidates) == 0:
                 msgr.message('fail: id "{0}" does not resolve to any element'.format(id))
+                ids[i] = ''
             else:
                 id = candidates.pop(0)
                 ids[i] = id
@@ -134,7 +139,8 @@ elif bearton.util.inrepo(path=TARGET) and str(ui) == 'edit':
         else:
             msgr.message('fail: there is no such page as {0}'.format(id))
     if '--render' in ui:
-        for i in ids: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=i, msgr=msgr)
+        for i in [i for i in ids if i != '']:
+            bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=i, msgr=msgr)
 elif bearton.util.inrepo(path=TARGET) and str(ui) == 'render':
     """This mode is used to render individua pages, groups of pages or whole sites.
     """

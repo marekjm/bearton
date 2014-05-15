@@ -80,7 +80,7 @@
             "long": "type",
             "arguments": ["str"],
             "conflicts": ["--all"],
-            "help": "build all new pages"
+            "help": "build all pages of given type"
         },
         {
             "long": "dry-run",
