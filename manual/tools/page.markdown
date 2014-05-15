@@ -7,12 +7,22 @@
 - rendering pages,
 
 To see quick help use `bearton-page --help`.
+Basic usage:
+
+```
+bearton-page <mode> [option...] [operand...]
+```
 
 ----
 
 ### Creating new page
 
 Creating new page is done with `bearton-page new` mode.
+
+```
+bearton-page new [-s <scheme>] [-e <element>] [--edit] [--render] <element> [<scheme>]
+```
+
 There are several ways to create a new page.
 
 **Specifying just the element (simplest way)**
@@ -108,8 +118,11 @@ Editing pages can be done with `bearton-page edit` mode.
 Multiple ids can be specified with `--from-file` option.
 
 ```
-bearton-page edit de24ad81
-bearton-page edit --page-id de24ad81
+bearton-page edit [--page-id <hash>] [--from-file <path>] [--render] [--markdown <what>] <hash>
+bearton-page edit [--base] <name>
+
+bearton-page edit <hash>
+bearton-page edit --page-id <hash>
 bearton-page edit --from-file ./list_of_ids_to_edit.txt
 ```
 
@@ -133,6 +146,10 @@ In such case, Bearton will search the `.bearton/db/pages/<hash>/markdown/` direc
 - `article.md` file,
 - `article.markdown` file,
 
+**Editing base elements**
+
+This is enabled with `--base` option.
+
 **Editor used**
 
 When editing, Bearton will use the editor pointed to by `EDITOR` environment variable and, in case it's not found, default to VIM.
@@ -144,7 +161,10 @@ When editing, Bearton will use the editor pointed to by `EDITOR` environment var
 Rendering of pages is done with `bearton-page render` mode.
 
 ```
-bearton-page render [<hash>...]
+bearton-page render [--dry-run [--print]] [<hash>...]
+bearton-page render [--dry-run [--print]] [--all | --type <name>]
+
+bearton-page render [--dry-run [--print]] $(bearton-db query <query>)
 ```
 
 This will render page with given ID and write the results to output path specified in meta of the page.

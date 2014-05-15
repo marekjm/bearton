@@ -17,15 +17,10 @@ It should be accompanied by `--schemes` option to point it to a directory from w
 Alternatively, it can be supplied with `--no-schemes` option, in whcih case Bearton will not try to copy any schemes.
 
 ```
-bearton-init init --schemes ~/.local/share/bearton/schemes
-bearton-init init --no-schemes
+bearton-init init [--schemes <path> | --no-schemes] [--target <path>]
 ```
 
-Standard `--target` option also applies to `bearton-init`, but should be used only for testing purposes:
-
-```
-bearton-init --target ./foo/bar init
-```
+`--target` option should be used only for testing purposes:
 
 ----
 
