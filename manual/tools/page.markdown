@@ -104,6 +104,39 @@ This provides for instant publishing of new pages.
 
 ### Editing existing page
 
+Editing pages can be done with `bearton-page edit` mode.
+Multiple ids can be specified with `--from-file` option.
+
+```
+bearton-page edit de24ad81
+bearton-page edit --page-id de24ad81
+bearton-page edit --from-file ./list_of_ids_to_edit.txt
+```
+
+It is possible to use first characters of the hash, Bearton will try to resolve them into full ID.
+
+**Editing context of page**
+
+By default, `bearton-page edit` will edit context of the page(s) with supplied id.
+
+**Editing Markdown partials**
+
+This can be achieved with `--markdown` option.
+
+```
+bearton-page edit --markdown article de24ad81
+```
+
+In such case, Bearton will search the `.bearton/db/pages/<hash>/markdown/` directory for:
+
+- `article` file,
+- `article.md` file,
+- `article.markdown` file,
+
+**Editor used**
+
+When editing, Bearton will use the editor pointed to by `EDITOR` environment variable and, in case it's not found, default to VIM.
+
 ----
 
 ### Rendering pages

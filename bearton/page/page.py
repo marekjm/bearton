@@ -63,7 +63,7 @@ def editmarkdown(path, page, element, msgr):
     """
     base = os.path.abspath(os.path.join(path, '.bearton', 'db', 'pages', page, 'markdown'))
     path = ''
-    for i in ['{0}', '{0}.markdown']:
+    for i in ['{0}', '{0}.md', '{0}.markdown']:
         candidate = os.path.join(base, i.format(element))
         if os.path.isfile(candidate):
             path = candidate
