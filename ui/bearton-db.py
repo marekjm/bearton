@@ -61,13 +61,13 @@ if bearton.util.inrepo(path=TARGET) and str(ui) == 'query':
     if '--with-output' in ui: signature += ' {:output@meta}'
     for i in pages: msgr.message(db.get(i).getsignature(signature), 0)
 elif bearton.util.inrepo(path=TARGET) and str(ui) == 'update':
-    if '--wipe' in ui:
+    if '--erase' in ui:
         really = ('yes' if '--yes' in ui else input('do you really want to wipe out the database? [y/n] '))
         really = (True if really.strip().lower() in ['y', 'yes'] else False)
         if not really:
             msgr.debug('cancelled database wipeout')
         else:
-            db.wipe()
+            db.erase()
             msgr.debug('wiped database contents from: {0}'.format(os.path.join(SITE_PATH, '.bearton', 'db')))
     else:
         metadata, contexts = db.update(SCHEMES_PATH)

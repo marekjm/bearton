@@ -97,5 +97,25 @@ Used to update the database.
 
 ```
 bearton-db update [--context-edits-log <path>]
-bearton-db update --wipe [--yes]
+bearton-db update --erase [--yes]
 ```
+
+**Updating**
+
+Updating database will update contexts of the entries already present.
+This should not be needed for base elements - e.g. menus, footers, headers - as they should be standardized.
+To decrease the possibility of page elements needing a context update fast-changing elements of pages shall
+be stored as Markdown partials.
+
+Only highly template-able parts of pages *should* be implemented to rely heavily on Mustache.
+This includes standardized descritions of books, products, software etc., tables, lists and like elements.
+
+Articles shall be always implemented as Markdown partials.
+
+In case a context update requiring manual changes was done, the ID of page will be put into log file.
+
+**Erasing**
+
+Database can be erased with `--erase` option.
+Bearton will then ask user if they really want to do it, `--yes` option may be passed with `--erase`
+to skip the confirmation step.

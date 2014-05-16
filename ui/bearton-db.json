@@ -40,15 +40,15 @@
     ],
     "update": [
         {
-            "short": "W",
-            "long": "wipe",
-            "help": "wipe out the database"
+            "short": "E",
+            "long": "erase",
+            "help": "erase the database (remove all entries)"
         },
         {
             "short": "y",
             "long": "yes",
             "help": "Bearton will not ask for confirmation when wiping the database out",
-            "requires": ["--wipe"]
+            "requires": ["--erase"]
         },
         {
             "short": "l",
