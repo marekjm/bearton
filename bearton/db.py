@@ -20,6 +20,8 @@ class Entry:
         self._changed = False
 
     def load(self):
+        """Load entry from disk.
+        """
         epath = os.path.join(self._path, self._entry)
         meta = {'requires': {'contexts': [], 'base': []},
                 'output': '',
@@ -129,6 +131,8 @@ class Entry:
         self._changed = False
 
     def remove(self):
+        """Remove entry from database.
+        """
         shutil.rmtree(os.path.join(self._path, self._entry))
 
 
@@ -149,23 +153,33 @@ class Database:
         return iter([self._db[key] for key in self._db])
 
     def _readdb(self):
+        """Read database from disk, by scaning the diectory and loading all found entries.
+        """
         entries = (os.listdir(self._path) if os.path.isdir(self._path) else [])
         entries = [(entry, Entry(self._path, entry).load()) for entry in entries]
         return dict(entries)
 
     def load(self):
+        """Load database from disk.
+        """
         self._db = self._readdb()
         return self
 
     def store(self):
+        """Write database to disk.
+        """
         if self._db is not None:
             for entry in self: entry.store()
         return self
 
     def unload(self):
+        """Unload the database.
+        """
         self._db = None
 
     def keys(self):
+        """Returns list of keys of all entries in database.
+        """
         return [key for key in self._db]
 
     def query(self, scheme, element, queryd={}, querytags=[]):
@@ -225,9 +239,13 @@ class Database:
         return self.query(*self._parsequery(query))
 
     def get(self, key):
+        """Return entry with given ID.
+        """
         return self._db[key]
 
-    def wipe(self):
+    def erase(self):
+        """Removes all entries in the database.
+        """
         for entry in self: entry.remove()
         self._readdb()
 
