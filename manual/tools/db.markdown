@@ -100,7 +100,7 @@ bearton-db update [--context-edits-log <path>]
 bearton-db update --erase [--yes]
 ```
 
-**Updating**
+#### Updating
 
 Updating database will update contexts of the entries already present.
 This should not be needed for base elements - e.g. menus, footers, headers - as they should be standardized.
@@ -114,7 +114,7 @@ Articles shall be always implemented as Markdown partials.
 
 In case a context update requiring manual changes was done, the ID of page will be put into log file.
 
-**Erasing**
+#### Erasing
 
 Database can be erased with `--erase` option.
 Bearton will then ask user if they really want to do it, `--yes` option may be passed with `--erase`
