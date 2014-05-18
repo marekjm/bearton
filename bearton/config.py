@@ -40,6 +40,27 @@ class Configuration:
         if not path: path = None
         return path
 
+    def guard(self):
+        """Put guard on config.
+        """
+        if Configuration._guarded is not True:
+            Configuration._guarded = True
+            Configuration._guard = self
+        else:
+            raise Exception('guard is already put on config')
+        return self
+
+    def unguard(self):
+        """Remove guard from config.
+        """
+        if Configuration._guarded is True and Configuration._guard is self:
+            Configuration._guarded = False
+            Configuration._guard = None
+        elif Configuration._guard is not self:
+            raise Exception('guard has been put on config by different object')
+            raise Exception('guard is already put on config')
+        return self
+
     def load(self, guard=False):
         """Loads configuration file.
         If `guard` is true, it will guard the file from being written; the runtime copy may be modified at will though.
@@ -69,7 +90,7 @@ class Configuration:
         """Stores configration file and
         writes any changes made.
         """
-        if Configuration._guarded is not True and self._conf is not None: util.writefile(path=self._path, s=json.dumps(self._conf))
+        if Configuration._guarded is not True and self._conf is not None and self._path is not None: util.writefile(path=self._path, s=json.dumps(self._conf))
         return self
 
     def get(self, key):
