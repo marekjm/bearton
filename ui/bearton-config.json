@@ -9,7 +9,8 @@
         {
             "short": "l",
             "long": "list",
-            "help": "list all keys (if verbose, list all key:value pairs)"
+            "conflicts": ["--key"],
+            "help": "list all keys (if verbose, list all key=value pairs)"
         },
         {
             "short": "j",
