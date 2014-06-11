@@ -5,22 +5,55 @@ import os
 from sys import argv
 
 import clap
+import muspyche
 
 import bearton
 
 
 # Building UI
-args = clap.formater.Formater(argv[1:])
-args.format()
-
+argv = list(clap.formatter.Formatter(argv[1:]).format())
 _file = os.path.splitext(os.path.split(__file__)[-1])[0]
-uipath = os.path.join(bearton.util.getuipath(), '{0}.json'.format(_file))
-builder = clap.builder.Builder(uipath, argv=list(args))
-builder.build()
+uipath = os.path.join(bearton.util.getuipath(), '{0}.clap.json'.format(_file))
 
-ui = builder.get()
-ui.check()
-ui.parse()
+try:
+    ifstream = open(uipath, 'r')
+    model = json.loads(ifstream.read())
+    ifstream.close()
+    err = None
+except Exception as e:
+    err = e
+finally:
+    if err is not None:
+        print('failed to read UI description conatined in "{0}": {1}'.format(uipath, err))
+        exit(1)
+
+mode = clap.builder.Builder(model).build().get()
+parser = clap.parser.Parser(mode).feed(argv)
+
+try:
+    clap.checker.RedChecker(parser).check()
+    fail = False
+except clap.errors.MissingArgumentError as e:
+    print('missing argument for option: {0}'.format(e))
+    fail = True
+except clap.errors.UnrecognizedOptionError as e:
+    print('unrecognized option found: {0}'.format(e))
+    fail = True
+except clap.errors.ConflictingOptionsError as e:
+    print('conflicting options found: {0}'.format(e))
+    fail = True
+except clap.errors.RequiredOptionNotFoundError as e:
+    print('required option not found: {0}'.format(e))
+    fail = True
+except clap.errors.InvalidOperandRangeError as e:
+    print('invalid number of operands: {0}'.format(e))
+    fail = True
+except Exception as e:
+    fail = True
+    raise e
+finally:
+    if fail: exit()
+    else: ui = parser.parse().ui().finalise()
 
 
 # Setting constants for later use
@@ -30,24 +63,42 @@ SCHEMES_PATH = (ui.get('-S') if '--schemes' in ui else bearton.util.getschemespa
 
 
 # Creating widely used objects
-msgr = bearton.util.Messenger(verbosity=int('--verbose' in ui), debugging=('--debug' in ui), quiet=('--quiet' in ui))
+msgr = bearton.util.Messenger(verbosity=(ui.get('-v') if '--verbose' in ui else 0), debugging=('--debug' in ui), quiet=('--quiet' in ui))
 db = bearton.db.db(path=SITE_PATH).load()
 config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 
 
+# -----------------------------
+#   UI logic code goes HERE!  |
+# -----------------------------
+# ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+if str(ui) == '':
+    if '--version' in ui:
+        msgr.debug('verbosity level: {0}'.format(ui.get('--verbose') if '--verbose' in ui else 0))
+        msgr.message('bearton version {0}'.format(bearton.__version__), 0)
+        for name, module in [('clap', clap), ('muspyche', muspyche), ('clap', clap)]:
+            msgr.debug('using "{0}" library v. {1}'.format(name, module.__version__))
+    if '--help' in ui:
+        msgr.message(clap.helper.Helper(_file, mode).gen().render())
+if not ui.islast(): ui = ui.down()
+
+# --------------------------------------
+#   Per-mode UI logic code goes HERE!  |
+# --------------------------------------
+# ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
 if bearton.util.inrepo(path=TARGET) and str(ui) == 'query':
     if '--raw' in ui:
         scheme, element, queryd, querytags = db._parsequery(ui.get('-r'))
     else:
-        if len(ui.arguments) > 2:
-            msgr.message('fatal: invalid number of operands: expected at most 2 but got {0}'.format(len(ui.arguments)))
+        if len(ui.operands()) > 2:
+            msgr.message('fatal: invalid number of operands: expected at most 2 but got {0}'.format(len(ui.operands())))
             exit(1)
-        scheme = (ui.arguments.pop(0) if len(ui.arguments) == 2 else config.get('scheme'))
+        scheme = (ui.operands().pop(0) if len(ui.operands()) == 2 else config.get('scheme'))
         scheme = (ui.get('-s') if '--scheme' in ui else scheme)
-        element = (ui.arguments.pop(0) if ui.arguments else '')
+        element = (ui.operands().pop(0) if ui.operands() else '')
         element = (ui.get('-e') if '--element' in ui else element)
         queryd = {}
-        for a in ui.arguments:
+        for a in ui.operands():
             if '=' not in a: continue
             a = a.split('=', 1)
             key, value = a[0], a[1]
@@ -78,10 +129,6 @@ elif bearton.util.inrepo(path=TARGET) and str(ui) == 'update':
             if '--context-edits-log' in ui: log = ui.get('--context-edits-log')
             bearton.util.writefile(log, '\n'.join(contexts))
             msgr.message('entries that possibly - in case something was added - require context edits were placed in "{0}" file'.format(log), 0)
-elif str(ui) == '':
-    if '--version' in ui: msgr.message(('bearton version {0}' if '--verbose' in ui else '{0}').format(bearton.__version__), 0)
-    if '--help' in ui:
-        print('\n'.join(clap.helper.Helper(ui).help()))
 else:
     try: bearton.util.inrepo(path=TARGET, panic=True)
     except bearton.exceptions.BeartonError as e: msgr.message('fatal: {0}'.format(e))

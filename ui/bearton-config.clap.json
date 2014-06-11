@@ -1,0 +1,117 @@
+{
+    "help": "Interface to Bearton configuration file.",
+    "modes": {
+        "get": {
+            "help": "Mode used for getting information about configuration.",
+            "options": {
+                "local": [
+                    {
+                        "short": "k",
+                        "long": "key",
+                        "arguments": ["str"],
+                        "help": "get value of key"
+                    },
+                    {
+                        "short": "l",
+                        "long": "list",
+                        "conflicts": ["--key"],
+                        "help": "list all keys (if verbose, list all key=value pairs)"
+                    },
+                    {
+                        "short": "j",
+                        "long": "json",
+                        "help": "format output as JSON"
+                    }
+                ]
+            },
+            "operands": {
+                "no": [0, 1]
+            }
+        },
+        "set": {
+            "help": "Mode used for setting information in configuration, e.g. setting new keys, changing their values etc.",
+            "options": {
+                "local": [
+                    {
+                        "short": "k",
+                        "long": "key",
+                        "arguments": ["str"],
+                        "help": "set value of key"
+                    },
+                    {
+                        "short": "V",
+                        "long": "value",
+                        "arguments": ["str"],
+                        "requires": ["--key"],
+                        "help": "give value to set"
+                    }
+                ]
+            },
+            "operands": {
+                "no": [0, 2]
+            }
+        },
+        "rm": {
+            "help": "Mode used for removing information from configuration",
+            "options": {
+                "local": [
+                    {
+                        "short": "k",
+                        "long": "key",
+                        "arguments": ["str"],
+                        "help": "remove key from config"
+                    },
+                    {
+                        "short": "p",
+                        "long": "pop",
+                        "requires": ["--key"],
+                        "help": "print value of the key before removing it"
+                    }
+                ]
+            },
+            "operands": {
+                "no": [0, 0]
+            }
+        }
+    },
+    "options": {
+        "local": [
+            {
+                "short": "h",
+                "long": "help",
+                "help": "dispay help message"
+            },
+            {
+                "long": "version",
+                "help": "display version information"
+            }
+        ],
+        "global": [
+            {
+                "short": "v",
+                "long": "verbose",
+                "plural": true,
+                "help": "display more verbose output"
+            },
+            {
+                "short": "d",
+                "long": "debug",
+                "help": "display debugging output"
+            },
+            {
+                "short": "q",
+                "long": "quiet",
+                "help": "do not print normal messages"
+            },
+            {
+                "short": "t",
+                "long": "target",
+                "arguments": ["str"],
+                "help": "set target directory"
+            }
+        ]
+    },
+    "operands": {
+        "no": [0, 0]
+    }
+}

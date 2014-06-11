@@ -1,0 +1,170 @@
+{
+    "help": "Tool used to manage Bearton pages.",
+    "modes": {
+        "new": {
+            "help": "Mode used to create new pages.",
+            "options": {
+                "local": [
+                    {
+                        "short": "s",
+                        "long": "scheme",
+                        "arguments": ["str"],
+                        "help": "use given scheme to create the page"
+                    },
+                    {
+                        "short": "e",
+                        "long": "element",
+                        "arguments": ["str"],
+                        "help": "use given element to create the page, even if string does not point to any element Bearton will not try to match it"
+                    },
+                    {
+                        "short": "b",
+                        "long": "base",
+                        "help": "tells Bearton this is a base element that will be built"
+                    },
+                    {
+                        "short": "E",
+                        "long": "edit",
+                        "help": "instantly launch editor after the page is created"
+                    },
+                    {
+                        "short": "R",
+                        "long": "render",
+                        "requires": ["--edit"],
+                        "help": "render the page instantly after it is created and edited"
+                    }
+                ]
+            },
+            "operands": {
+                "no": [0, 2]
+            }
+        },
+        "edit": {
+            "help": "Mode used to edit existing pages.",
+            "options": {
+                "local": [
+                    {
+                        "short": "p",
+                        "long": "page-id",
+                        "arguments": ["str"],
+                        "help": "specify page id"
+                    },
+                    {
+                        "short": "b",
+                        "long": "base",
+                        "requires": ["--page-id"],
+                        "help": "tells Bearton it will be base element that needs editing"
+                    },
+                    {
+                        "short": "F",
+                        "long": "from-file",
+                        "arguments": ["str"],
+                        "help": "read page ids - newline separated - from file"
+                    },
+                    {
+                        "short": "r",
+                        "long": "render",
+                        "help": "re-render the page after editing"
+                    },
+                    {
+                        "short": "m",
+                        "long": "markdown",
+                        "arguments": ["str"],
+                        "help": "edit Markdown entry with given <name>"
+                    }
+                ]
+            },
+            "operands": {
+                "no": [-1]
+            }
+        },
+        "rm": {
+            "help": "Mode used to remove pages.",
+            "options": {
+                "local": [
+                    {
+                        "short": "p",
+                        "long": "page-id",
+                        "arguments": ["str"],
+                        "required": true,
+                        "help": "specify page id"
+                    }
+                ]
+            },
+            "operands": {
+                "no": [-1]
+            }
+        },
+        "render": {
+            "help": "Mode managing the rendering of pages.",
+            "options": {
+                "local": [
+                    {
+                        "short": "a",
+                        "long": "all",
+                        "help": "build all pages (a rebuilt of the site)"
+                    },
+                    {
+                        "short": "t",
+                        "long": "type",
+                        "arguments": ["str"],
+                        "conflicts": ["--all"],
+                        "help": "build all pages of given type"
+                    },
+                    {
+                        "long": "dry-run",
+                        "help": "render pages but do not write them to output files"
+                    },
+                    {
+                        "long": "print",
+                        "requires": ["--dry-run"],
+                        "help": "print rendered HTML while dry running"
+                    }
+                ]
+            },
+            "operands": {
+                "no": [0]
+            }
+        }
+    },
+    "options": {
+        "local": [
+            {
+                "short": "h",
+                "long": "help",
+                "help": "dispay help message"
+            },
+            {
+                "long": "version",
+                "help": "display version information"
+            }
+        ],
+        "global": [
+            {
+                "short": "v",
+                "long": "verbose",
+                "plural": true,
+                "help": "display more verbose output"
+            },
+            {
+                "short": "d",
+                "long": "debug",
+                "help": "display debugging output"
+            },
+            {
+                "short": "q",
+                "long": "quiet",
+                "help": "do not print normal messages"
+            },
+            {
+                "short": "t",
+                "long": "target",
+                "arguments": ["str"],
+                "help": "set target directory"
+            }
+        ]
+    },
+    "operands": {
+        "no": [0, 0]
+    }
+}

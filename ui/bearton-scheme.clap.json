@@ -1,0 +1,102 @@
+{
+    "help": "Tool used to manage Bearton schemes.",
+    "modes": {
+        "apply": {
+            "help": "Apply scheme to page.",
+            "options": {
+                "local": [
+                    {
+                        "short": "n",
+                        "long": "name",
+                        "arguments": ["str"],
+                        "help": "name of the theme to apply (default: the name set in site's config)"
+                    },
+                    {
+                        "short": "f",
+                        "long": "force",
+                        "help": "remove all existing scheme-parts before applying"
+                    }
+                ]
+            },
+            "operands": {
+                "no": [0, 0]
+            }
+        },
+        "rm": {,
+            "help": "Remove scheme.",
+            "operands": {
+                "no": [0, 0]
+            }
+        },
+        "inspect": {
+            "help": "Get information about scheme.",
+            "options": {
+                "local": [
+                    {
+                        "short": "e",
+                        "long": "elements",
+                        "help": "list all elements of a scheme"
+                    },
+                    {
+                        "short": "b",
+                        "long": "buildable",
+                        "help": "list only buildable elements"
+                    },
+                    {
+                        "short": "B",
+                        "long": "base",
+                        "help": "list only base elements"
+                    },
+                    {
+                        "long": "not",
+                        "wants": ["--buildable", "--base"],
+                        "help": "negate modifier"
+                    }
+                ]
+            },
+            "operands": {
+                "no": [0, 0]
+            }
+        }
+    },
+    "options": {
+        "local": [
+            {
+                "short": "h",
+                "long": "help",
+                "help": "dispay help message"
+            },
+            {
+                "long": "version",
+                "help": "display version information"
+            }
+        ],
+        "global": [
+            {
+                "short": "v",
+                "long": "verbose",
+                "plural": true,
+                "help": "display more verbose output"
+            },
+            {
+                "short": "d",
+                "long": "debug",
+                "help": "display debugging output"
+            },
+            {
+                "short": "q",
+                "long": "quiet",
+                "help": "do not print normal messages"
+            },
+            {
+                "short": "t",
+                "long": "target",
+                "arguments": ["str"],
+                "help": "set target directory"
+            }
+        ]
+    },
+    "operands": {
+        "no": [0, 0]
+    }
+}

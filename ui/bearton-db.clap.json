@@ -1,0 +1,117 @@
+{
+    "help": "Interface to Bearton database.",
+    "modes": {
+        "query": {
+            "options": {
+                "local": [
+                    {
+                        "short": "s",
+                        "long": "scheme",
+                        "arguments": ["str"],
+                        "help": "set scheme to query"
+                    },
+                    {
+                        "short": "e",
+                        "long": "element",
+                        "arguments": ["str"],
+                        "help": "set element to query"
+                    },
+                    {
+                        "short": "F",
+                        "long": "format",
+                        "arguments": ["str"],
+                        "requires": ["--verbose"],
+                        "help": "print strings in given format"
+                    },
+                    {
+                        "short": "O",
+                        "long": "with-output",
+                        "conflicts": ["--format"],
+                        "help": "display output paths of matched pages"
+                    },
+                    {
+                        "short": "b",
+                        "long": "base",
+                        "help": "query base-type elements"
+                    },
+                    {
+                        "short": "r",
+                        "long": "raw",
+                        "arguments": ["str"],
+                        "conflicts": ["-s", "-e"],
+                        "help": "takes raw query string (see doc/ to learn how to write them)"
+                    }
+                ]
+            },
+            "operands": {
+                "no": [-2]
+            }
+        },
+        "update": {
+            "options": {
+                "local": [
+                    {
+                        "short": "E",
+                        "long": "erase",
+                        "help": "erase the database (remove all entries)"
+                    },
+                    {
+                        "short": "y",
+                        "long": "yes",
+                        "help": "Bearton will not ask for confirmation when wiping the database out",
+                        "requires": ["--erase"]
+                    },
+                    {
+                        "short": "l",
+                        "long": "context-edits-log",
+                        "arguments": ["str"],
+                        "help": "path to a file in which the list of required context edits will be stored"
+                    }
+                ]
+            },
+            "operands": {
+                "no": [0, 0]
+            }
+        }
+    },
+    "options": {
+        "local": [
+            {
+                "short": "h",
+                "long": "help",
+                "help": "dispay help message"
+            },
+            {
+                "long": "version",
+                "help": "display version information"
+            }
+        ],
+        "global": [
+            {
+                "short": "v",
+                "long": "verbose",
+                "plural": true,
+                "help": "display more verbose output"
+            },
+            {
+                "short": "d",
+                "long": "debug",
+                "help": "display debugging output"
+            },
+            {
+                "short": "q",
+                "long": "quiet",
+                "help": "do not print normal messages"
+            },
+            {
+                "short": "t",
+                "long": "target",
+                "arguments": ["str"],
+                "help": "set target directory"
+            }
+        ]
+    },
+    "operands": {
+        "no": [0, 0]
+    }
+}
