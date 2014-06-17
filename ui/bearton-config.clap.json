@@ -77,16 +77,16 @@
     "options": {
         "local": [
             {
-                "short": "h",
-                "long": "help",
-                "help": "dispay help message"
-            },
-            {
                 "long": "version",
                 "help": "display version information"
             }
         ],
         "global": [
+            {
+                "short": "h",
+                "long": "help",
+                "help": "dispay help message"
+            },
             {
                 "short": "v",
                 "long": "verbose",

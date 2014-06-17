@@ -72,14 +72,25 @@ config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 #   UI logic code goes HERE!  |
 # -----------------------------
 # ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+if not ui.islast(): ui = ui.down()
 if str(ui) == '':
     if '--version' in ui:
         msgr.debug('verbosity level: {0}'.format(ui.get('--verbose') if '--verbose' in ui else 0))
         msgr.message('bearton version {0}'.format(bearton.__version__), 0)
-        for name, module in [('clap', clap), ('muspyche', muspyche), ('clap', clap)]:
-            msgr.debug('using "{0}" library v. {1}'.format(name, module.__version__))
-    if '--help' in ui:
-        msgr.message(clap.helper.Helper(_file, mode).gen().render())
+        for name, module in [('clap', clap), ('muspyche', muspyche), ('clap', clap)]: msgr.debug('using "{0}" library v. {1}'.format(name, module.__version__))
+
+hui = ui
+while True:
+    if '--help' in hui:
+        helper = clap.helper.Helper(_file, hui._mode).setmaxlen(n=140)
+        usage = []
+        if hui.up() is hui: [helper.addUsage(i) for i in usage]
+        msgr.message(helper.gen(deep=('--verbose' in hui)).render())
+        if '--verbose' not in hui: msgr.message('\nRun "{0} --help --verbose" to see full help message'.format(_file))
+        exit(0)
+    if hui.islast(): break
+    hui = hui.down()
+
 if not ui.islast(): ui = ui.down()
 
 # --------------------------------------
