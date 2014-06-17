@@ -6,3 +6,5 @@
 bearton-db index        # indexes db
 bearton-page purge      # database.paths()
 ```
+
+- implement generating JSON files,
