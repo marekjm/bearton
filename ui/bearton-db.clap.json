@@ -1,5 +1,5 @@
 {
-    "help": "Interface to Bearton database.",
+    "doc": {"help": "Interface to Bearton database."},
     "modes": {
         "query": {
             "options": {

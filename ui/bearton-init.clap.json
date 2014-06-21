@@ -1,8 +1,8 @@
 {
-    "help": "Tool used to manage Bearton repositories.",
+    "doc": {"help": "Tool used to manage Bearton repositories."},
     "modes": {
         "init": {
-            "help": "Mode used to (re)initalise Bearton repositories.",
+            "doc": {"help": "Mode used to (re)initalise Bearton repositories."},
             "options": {
                 "local": [
                     {
@@ -37,10 +37,10 @@
             }
         },
         "rm": {
-            "help": "Mode used to remove Bearton repositories."
+            "doc": {"help": "Mode used to remove Bearton repositories."}
         },
         "sync": {
-            "help": "Mode used to update Bearton repositories.",
+            "doc": {"help": "Mode used to update Bearton repositories."},
             "options": {
                 "local": [
                     {

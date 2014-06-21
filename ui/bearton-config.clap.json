@@ -1,8 +1,8 @@
 {
-    "help": "Interface to Bearton configuration file.",
+    "doc": {"help": "Interface to Bearton configuration file."},
     "modes": {
         "get": {
-            "help": "Mode used for getting information about configuration.",
+            "doc": {"help": "Mode used for getting information about configuration."},
             "options": {
                 "local": [
                     {
@@ -29,7 +29,7 @@
             }
         },
         "set": {
-            "help": "Mode used for setting information in configuration, e.g. setting new keys, changing their values etc.",
+            "doc": {"help": "Mode used for setting information in configuration, e.g. setting new keys, changing their values etc."},
             "options": {
                 "local": [
                     {
@@ -52,7 +52,7 @@
             }
         },
         "rm": {
-            "help": "Mode used for removing information from configuration",
+            "doc": {"help": "Mode used for removing information from configuration"},
             "options": {
                 "local": [
                     {

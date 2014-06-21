@@ -39,5 +39,5 @@
     "operands": {
         "no": [0, 0]
     },
-    "help": "Bare Bearton tool. Foundation for building other Bearton tools."
+    "doc": {"help": "Bare Bearton tool. Foundation for building other Bearton tools."}
 }

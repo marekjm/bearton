@@ -1,8 +1,8 @@
 {
-    "help": "Tool used to manage Bearton schemes.",
+    "doc": {"help": "Tool used to manage Bearton schemes."},
     "modes": {
         "apply": {
-            "help": "Apply scheme to page.",
+            "doc": {"help": "Apply scheme to page."},
             "options": {
                 "local": [
                     {
@@ -22,14 +22,14 @@
                 "no": [0, 0]
             }
         },
-        "rm": {,
-            "help": "Remove scheme.",
+        "rm": {
+            "doc": {"help": "Remove scheme."},
             "operands": {
                 "no": [0, 0]
             }
         },
         "inspect": {
-            "help": "Get information about scheme.",
+            "doc": {"help": "Get information about scheme."},
             "options": {
                 "local": [
                     {
