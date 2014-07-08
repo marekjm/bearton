@@ -1,7 +1,7 @@
 """Various utility functions.
 """
 
-
+import json
 import os
 import re
 import sys
@@ -192,6 +192,24 @@ def getuipath(cwd=''):
             path = os.path.join(*p)
             break
     return path
+
+def getuimodel(filename):
+    """Takes a filename (from the __file__ of the calling script) and
+    returns a tuple: (extracted-filename, ui-model)
+    """
+    filename = os.path.splitext(os.path.split(filename)[-1])[0]
+    uipath = os.path.join(getuipath(), '{0}.clap.json'.format(filename))
+    try:
+        ifstream = open(uipath, 'r')
+        model = json.loads(ifstream.read())
+        ifstream.close()
+        err = None
+    except Exception as e:
+        err = e
+    finally:
+        if err is not None:
+            raise type(err)('failed to read UI description located at "{0}": {1}'.format(uipath, err))
+    return (filename, model)
 
 def getrepopath(path='.'):
     """Returns path to the bearton repo or empty string if path cannot be found.

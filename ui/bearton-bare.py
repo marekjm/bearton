@@ -10,22 +10,10 @@ import muspyche
 import bearton
 
 
+# Obtaining requred filename and model
+_file, model = bearton.util.getuimodel(__file__)
+
 # Building UI
-_file = os.path.splitext(os.path.split(__file__)[-1])[0]
-uipath = os.path.join(bearton.util.getuipath(), '{0}.clap.json'.format(_file))
-
-try:
-    ifstream = open(uipath, 'r')
-    model = json.loads(ifstream.read())
-    ifstream.close()
-    err = None
-except Exception as e:
-    err = e
-finally:
-    if err is not None:
-        print('failed to read UI description conatined in "{0}": {1}'.format(uipath, err))
-        exit(1)
-
 argv = list(clap.formatter.Formatter(argv[1:]).format())
 command = clap.builder.Builder(model).insertHelpCommand().build().get()
 parser = clap.parser.Parser(command).feed(argv)
