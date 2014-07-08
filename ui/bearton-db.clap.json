@@ -1,6 +1,10 @@
 {
-    "doc": {"help": "Interface to Bearton database."},
-    "modes": {
+    "doc": {
+        "help": "Interface to Bearton database.",
+        "usage": [],
+        "examples": []
+    },
+    "commands": {
         "query": {
             "options": {
                 "local": [

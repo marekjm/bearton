@@ -1,6 +1,10 @@
 {
-    "doc": {"help": "Tool used to manage Bearton repositories."},
-    "modes": {
+    "doc": {
+        "help": "Tool used to manage Bearton repositories.",
+        "usage": [],
+        "examples": []
+    },
+    "commands": {
         "init": {
             "doc": {"help": "Mode used to (re)initalise Bearton repositories."},
             "options": {

@@ -10,25 +10,13 @@ import muspyche
 import bearton
 
 
+# Obtaining requred filename and model
+_file, model = bearton.util.getuimodel(__file__)
+
 # Building UI
 argv = list(clap.formatter.Formatter(argv[1:]).format())
-_file = os.path.splitext(os.path.split(__file__)[-1])[0]
-uipath = os.path.join(bearton.util.getuipath(), '{0}.clap.json'.format(_file))
-
-try:
-    ifstream = open(uipath, 'r')
-    model = json.loads(ifstream.read())
-    ifstream.close()
-    err = None
-except Exception as e:
-    err = e
-finally:
-    if err is not None:
-        print('failed to read UI description conatined in "{0}": {1}'.format(uipath, err))
-        exit(1)
-
-mode = clap.builder.Builder(model).build().get()
-parser = clap.parser.Parser(mode).feed(argv)
+command = clap.builder.Builder(model).insertHelpCommand().build().get()
+parser = clap.parser.Parser(command).feed(argv)
 
 try:
     clap.checker.RedChecker(parser).check()
@@ -71,32 +59,18 @@ config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 # -----------------------------
 #   UI logic code goes HERE!  |
 # -----------------------------
-# ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
-if not ui.islast(): ui = ui.down()
-if str(ui) == '':
-    if '--version' in ui:
-        msgr.debug('verbosity level: {0}'.format(ui.get('--verbose') if '--verbose' in ui else 0))
-        msgr.message('bearton version {0}'.format(bearton.__version__), 0)
-        for name, module in [('clap', clap), ('muspyche', muspyche), ('clap', clap)]: msgr.debug('using "{0}" library v. {1}'.format(name, module.__version__))
-
-hui = ui
-while True:
-    if '--help' in hui:
-        helper = clap.helper.Helper(_file, hui._mode).setmaxlen(n=140)
-        usage = []
-        if hui.up() is hui: [helper.addUsage(i) for i in usage]
-        msgr.message(helper.gen(deep=('--verbose' in hui)).render())
-        if '--verbose' not in hui: msgr.message('\nRun "{0} --help --verbose" to see full help message'.format(_file))
-        exit(0)
-    if hui.islast(): break
-    hui = hui.down()
+if '--version' in ui:
+    msgr.debug('verbosity level: {0}'.format(ui.get('--verbose') if '--verbose' in ui else 0))
+    msgr.message('bearton version {0}'.format(bearton.__version__), 0)
+    for name, module in [('clap', clap), ('muspyche', muspyche)]:
+        msgr.debug('using "{0}" library v. {1}'.format(name, module.__version__))
+if clap.helper.HelpRunner(ui=ui, program=_file).run().displayed(): exit()
 
 if not ui.islast(): ui = ui.down()
 
 # --------------------------------------
 #   Per-mode UI logic code goes HERE!  |
 # --------------------------------------
-# ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
 if bearton.util.inrepo(path=TARGET) and str(ui) == 'new':
     """This mode is employed for creating new pages.
     """

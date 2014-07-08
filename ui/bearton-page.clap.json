@@ -1,6 +1,10 @@
 {
-    "doc": {"help": "Tool used to manage Bearton pages."},
-    "modes": {
+    "doc": {
+        "help": "Tool used to manage Bearton pages.",
+        "usage": [],
+        "examples": []
+    },
+    "commands": {
         "new": {
             "doc": {"help": "Mode used to create new pages."},
             "options": {

@@ -1,6 +1,10 @@
 {
-    "doc": {"help": "Interface to Bearton configuration file."},
-    "modes": {
+    "doc": {
+        "help": "Interface to Bearton configuration file.",
+        "usage": [],
+        "examples": []
+    },
+    "commands": {
         "get": {
             "doc": {"help": "Mode used for getting information about configuration."},
             "options": {
