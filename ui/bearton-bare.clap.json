@@ -1,4 +1,9 @@
 {
+    "doc": {
+        "help": "Bare Bearton tool. Foundation for building other Bearton tools.",
+        "usage": [],
+        "examples": []
+    },
     "options": {
         "local": [
             {
@@ -38,6 +43,5 @@
     },
     "operands": {
         "no": [0, 0]
-    },
-    "doc": {"help": "Bare Bearton tool. Foundation for building other Bearton tools."}
+    }
 }
