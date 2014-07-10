@@ -75,7 +75,6 @@ def getschemespaths(repo=''):
 def listschemes(scheme_paths):
     """List all available schemes in all locations.
     """
-    #scheme_paths = getschemespaths(repo)
     schemes = []
     for path in scheme_paths:
         ls = os.listdir(path)

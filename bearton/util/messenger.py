@@ -27,10 +27,16 @@ class Messenger:
             self._stream.write(self._line + self._lineend)
             self._line = ''
 
-    def setVerbosity(self, level):
+    def setVerbosity(self, level=1):
         """Sets verbosity level (integer).
         """
         self._verbosity = level
+        return self
+
+    def setDebug(self, enabled=True):
+        """Set debug output to enabled or disabled.
+        """
+        self._debugging = enabled
         return self
 
     def setlineending(self, ending='\n'):

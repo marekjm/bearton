@@ -17,7 +17,11 @@ REQUIRED_REPO_DIRECTORIES = [
     ('db', 'base'),
     ('tmp',),
     ('..', 'assets',),
+    ('..', 'assets', 'scheme'),
+    ('..', 'assets', 'custom'),
     ('..', 'data',),
+    ('..', 'data', 'scheme'),
+    ('..', 'data', 'custom'),
 ]
 
 
@@ -46,25 +50,3 @@ def update(target, messenger):
     """Updates Bearton repository, e.g. creates new directories required by more recent version of Bearton suite.
     """
     _newdirs(target, messenger)
-
-#def rm(target, msgr):
-#   for part in ['assets', 'data']:
-#        path = os.path.join(target, part)
-#        if os.path.isdir(path):
-#            shutil.rmtree(path)
-#            if messenger is not None: messenger.debug('removed: {0}'.format(path))
-#    path = os.path.join(target, '.bearton')
-#    if messenger is not None: messenger.debug('possible Bearton repo in: {0} ({1})'.format(path, os.path.isdir(path)))
-#    if os.path.isdir(path):
-#        shutil.rmtree(path)
-#        if messenger is not None: messenger.message('removed Bearton local from {0}'.format(path), 1)
-
-#def syncschemes(target, schemes, wanted, msgr):
-#    for w in wanted:
-#        targetpath = os.path.join(target, w)
-#        sourcepath = os.path.join(schemes, w)
-#        if os.path.isdir(targetpath):
-#            if messenger is not None: messenger.message('removing scheme "{0}" from {1}'.format(w, target), 1)
-#            shutil.rmtree(targetpath)
-#        if messenger is not None: messenger.message('copying scheme "{0}" from {1}'.format(w, schemes), 1)
-#        shutil.copytree(sourcepath, targetpath)

@@ -66,6 +66,7 @@ if clap.helper.HelpRunner(ui=ui, program=_file).run().displayed(): exit()
 
 if not ui.islast(): ui = ui.down()
 msgr.setVerbosity(ui.get('-v') if '--verbose' in ui else 0)
+msgr.setDebug('--debug' in ui)
 
 # --------------------------------------
 #   Per-mode UI logic code goes HERE!  |

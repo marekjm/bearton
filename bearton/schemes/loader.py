@@ -8,51 +8,69 @@ import shutil
 from .. import util
 
 
-def _copyassets(source, target, msgr):
-    msgr.debug('copying assets...')
-    shutil.copytree(os.path.join(source, 'assets'), os.path.join(target, 'assets'))
+def _copyassets(source, target, messenger=None):
+    """Copy media assets that come with the scheme.
+    """
+    src = os.path.join(source, 'assets')
+    trgt = os.path.join(target, 'assets', 'scheme')
+    if messenger is not None:
+        messenger.debug('copying assets: source: {0}'.format(src))
+        messenger.debug('copying assets: target: {0}'.format(trgt))
+    if os.path.isdir(trgt): shutil.rmtree(trgt)
+    shutil.copytree(src, trgt)
 
-def _copydata(source, target, msgr):
-    msgr.debug('copying data...')
-    shutil.copytree(os.path.join(source, 'data'), os.path.join(target, 'data'))
+def _copydata(source, target, messenger=None):
+    """Copy data (CSS, JavaScript, JSON, etc.) that come with the scheme.
+    """
+    src = os.path.join(source, 'data')
+    trgt = os.path.join(target, 'data', 'scheme')
+    if messenger is not None:
+        messenger.debug('copying data: source: {0}'.format(src))
+        messenger.debug('copying data: target: {0}'.format(trgt))
+    if os.path.isdir(trgt): shutil.rmtree(trgt)
+    shutil.copytree(src, trgt)
 
-def _makedirs(source, target, msgr):
-    meta = json.loads(util.readfile(os.path.join(source, 'meta.json')))
+def _makedirs(source, target, messenger=None):
+    """Create all directories required by the scheme.
+    """
+    meta = json.loads(util.io.read(os.path.join(source, 'meta.json')))
     dirs = (meta['dirs'] if 'dirs' in meta else [])
-    msgr.debug('creating {0} directorie(s) required by scheme...'.format(len(dirs)))
+    if messenger is not None: messenger.debug('creating {0} directorie(s) required by scheme...'.format(len(dirs)))
     for d in dirs:
         path = os.path.join(target, d)
         if os.path.isdir(path):
-            msgr.debug('warning: directory exists: {0}'.format(path))
+            if messenger is not None: messenger.debug('warning: directory exists: {0}'.format(path))
         else:
-            msgr.debug('creating directory: {0}'.format(path))
+            if messenger is not None: messenger.debug('creating directory: {0}'.format(path))
             os.mkdir(path)
 
-def apply(source, target, msgr):
-    msgr.debug('applying scheme: source: {0}'.format(source))
-    msgr.debug('applying scheme: target: {0}'.format(target))
-    _copyassets(source, target, msgr)
-    _copydata(source, target, msgr)
-    _makedirs(source, target, msgr)
+def apply(source, target, messenger=None):
+    """Apply scheme to current page.
+    """
+    if messenger is not None: messenger.debug('applying scheme: source: {0}'.format(source))
+    if messenger is not None: messenger.debug('applying scheme: target: {0}'.format(target))
+    _copyassets(source, target, messenger)
+    _copydata(source, target, messenger)
+    _makedirs(source, target, messenger)
 
 
-def _rmdirs(source, target, msgr):
-    meta = json.loads(util.readfile(os.path.join(source, 'meta.json')))
-    dirs = (meta['dirs'] if 'dirs' in meta else [])
-    dirs.reverse()
-    msgr.debug('removing {0} directorie(s) required by scheme...'.format(len(dirs)))
-    for d in dirs:
-        path = os.path.join(target, d)
-        if not os.path.isdir(path):
-            msgr.debug('warning: directory did not exist: {0}'.format(path))
-        else:
-            msgr.debug('removing directory: {0}'.format(path))
-            shutil.rmtree(path)
+#def _rmdirs(source, target, messenger=None):
+#    meta = json.loads(util.readfile(os.path.join(source, 'meta.json')))
+#    dirs = (meta['dirs'] if 'dirs' in meta else [])
+#    dirs.reverse()
+#    if messenger is not None: messenger.debug('removing {0} directorie(s) required by scheme...'.format(len(dirs)))
+#    for d in dirs:
+#        path = os.path.join(target, d)
+#        if not os.path.isdir(path):
+#            if messenger is not None: messenger.debug('warning: directory did not exist: {0}'.format(path))
+#        else:
+#            if messenger is not None: messenger.debug('removing directory: {0}'.format(path))
+#            shutil.rmtree(path)
 
-def rm(source, target, msgr):
-    for i in ['assets', 'data']:
-        path = os.path.join(target, i)
-        msgr.debug('removing {0} from: {1}'.format(i, path))
-        if os.path.isdir(path): shutil.rmtree(path)
-        else: msgr.debug('warning: directory does not exist: {0}'.format(path))
-    _rmdirs(source, target, msgr)
+#def rm(source, target, messenger=None):
+#    for i in ['assets', 'data']:
+#        path = os.path.join(target, i)
+#        if messenger is not None: messenger.debug('removing {0} from: {1}'.format(i, path))
+#        if os.path.isdir(path): shutil.rmtree(path)
+#        else: if messenger is not None: messenger.debug('warning: directory does not exist: {0}'.format(path))
+#    _rmdirs(source, target, messenger)
