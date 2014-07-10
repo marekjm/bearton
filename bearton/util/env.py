@@ -77,7 +77,7 @@ def getuimodel(filename):
             raise type(err)('failed to read UI description located at "{0}": {1}'.format(uipath, err))
     return (filename, model)
 
-def getrepopath(path='.'):
+def getrepopath(start='.'):
     """Returns path to the bearton repo or empty string if path cannot be found.
     """
     base, path = os.path.abspath(path), ''
@@ -85,6 +85,7 @@ def getrepopath(path='.'):
         path = base[:]
         if os.path.isdir(os.path.join(base, '.bearton')): break
         base, path = os.path.split(base)[0], ''
+    if not path: errors.RepositoryNotFound(os.path.abspath(start))
     return path
 
 

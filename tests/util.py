@@ -43,6 +43,11 @@ class UtilIOModuleTests(unittest.TestCase):
         self.assertEqual(string, bearton.util.io.read(path))
 
 
+class UtilEnvModuleTests(unittest.TestCase):
+    def testWithoutEnvGettingRepoPath(self):
+        self.assertRaises(bearton.errors.RepositoryNotFoundError, bearton.util.env.getrepopath, start=os.path.join(BASE_PATH, 'tmp'))
+
+
 if __name__ == '__main__':
     tmpfiles = [i for i in os.listdir('/tmp') if i.startswith('bearton_testing')]
     for i in tmpfiles:
