@@ -36,6 +36,15 @@ class UtilIOModuleTests(unittest.TestCase):
         got = bearton.util.io.read(os.path.join(BASE_PATH, './files/hello_world.txt'), default='This will fail')
         self.assertEqual(expected, got)
 
+    def testWritingToFile(self):
+        string = 'Hello World!'
+        path = '/tmp/bearton_testing.writing_to_file.txt'
+        bearton.util.io.write(path, string)
+        self.assertEqual(string, bearton.util.io.read(path))
+
 
 if __name__ == '__main__':
+    tmpfiles = [i for i in os.listdir('/tmp') if i.startswith('bearton_testing')]
+    for i in tmpfiles:
+        os.remove(os.path.join('/tmp', i))
     unittest.main()
