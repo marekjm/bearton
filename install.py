@@ -66,7 +66,7 @@ def install():
     ui_path = os.path.join(share_path, 'ui')
     print('installing ui descriptions in:', ui_path)
     if not os.path.isdir(ui_path): os.mkdir(ui_path)
-    uis = glob.glob('./ui/*.json')
+    uis = glob.glob('./ui/*.clap.json')
     width = 0
     for f in uis:
         n = len(f)
