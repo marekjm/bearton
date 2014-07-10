@@ -5,7 +5,7 @@ from . import init
 from . import schemes
 from . import page
 from . import servers
-from . import exceptions
+from . import errors
 
 
-__version__ = '0.0.9'
+__version__ = '0.0.10'
