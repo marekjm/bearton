@@ -12,6 +12,14 @@ class BeartonEnvironmentError(BeartonError):
     """
     pass
 
-
 class RepositoryNotFoundError(BeartonEnvironmentError):
+    pass
+
+class SchemesDirectoryNotFoundError(BeartonEnvironmentError):
+    pass
+
+class SchemePathNotFoundError(BeartonEnvironmentError):
+    pass
+
+class UIDescriptionsNotFoundError(BeartonEnvironmentError):
     pass

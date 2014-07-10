@@ -14,7 +14,7 @@ class Configuration:
     _guarded, _guard = False, None
 
     def __init__(self, path='.'):
-        self._path = path
+        self._path = (path if path.endswith('config.json') else os.path.join(path, 'config.json'))
         self._conf = None
 
     def __contains__(self, key):
@@ -28,18 +28,6 @@ class Configuration:
 
     def __iter__(self):
         return iter(self._conf)
-
-    def _getpath(self):
-        """Tries to find a path to config JSON file.
-        If path has not been found, returns None.
-        """
-        base, path = os.path.abspath(self._path), ''
-        while True and os.path.split(base)[1] != '':
-            path = os.path.join(base, '.bearton', 'config.json')
-            if os.path.isfile(path) or os.path.isdir(base): break
-            base, path = os.path.split(base)[0], ''
-        print('config path is:', path)
-        return path
 
     def guard(self):
         """Put guard on config.
@@ -69,8 +57,7 @@ class Configuration:
         if Configuration._guarded is not True and guard:
             Configuration._guarded = guard
             Configuration._guard = self
-        self._path = self._getpath()
-        conf = (json.loads(util.readfile(self._path, default=json.dumps(DEFAULT))) if self._path is not None else None)
+        conf = json.loads(util.io.read(self._path, default=json.dumps(DEFAULT)))
         if conf is not None: self._conf = conf
         else: self.default()
         return self
@@ -92,8 +79,7 @@ class Configuration:
         """Stores configration file and
         writes any changes made.
         """
-        print('writing conf to: {0}'.format(self._path))
-        if Configuration._guarded is not True and self._conf is not None and self._path is not None: util.writefile(path=self._path, s=json.dumps(self._conf))
+        if Configuration._guarded is not True and self._conf is not None and self._path is not None: util.io.write(path=self._path, s=json.dumps(self._conf))
         return self
 
     def get(self, key):
@@ -112,7 +98,7 @@ class Configuration:
         self.remove(key)
         return value
 
-    def kvalues(self):
+    def items(self):
         return [(k, v) for k, v in self._conf.items()]
 
     def keys(self):

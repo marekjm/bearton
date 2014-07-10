@@ -11,7 +11,8 @@ import bearton
 
 
 # Obtaining requred filename and model
-_file, model = bearton.util.getuimodel(__file__)
+_file = os.path.splitext(os.path.split(__file__)[1])[0]
+model = bearton.util.env.getuimodel(_file)
 
 # Building UI
 argv = list(clap.formatter.Formatter(argv[1:]).format())
@@ -46,12 +47,13 @@ finally:
 
 # Setting constants for later use
 TARGET = os.path.abspath(ui.get('-t') if '--target' in ui else '.')
-SITE_PATH = bearton.util.getrepopath(TARGET)
-SCHEMES_PATH = (ui.get('-S') if '--schemes' in ui else bearton.util.getschemespath(cwd=SITE_PATH))
+print('TARGET:', repr(TARGET))
+SITE_PATH = bearton.util.env.getrepopath(TARGET, nofail=True)
+print('SITE_PATH:', repr(SITE_PATH))
 
 
 # Creating widely used objects
-msgr = bearton.util.Messenger(verbosity=(ui.get('-v') if '--verbose' in ui else 0), debugging=('--debug' in ui), quiet=('--quiet' in ui))
+msgr = bearton.util.messenger.Messenger(verbosity=(ui.get('-v') if '--verbose' in ui else 0), debugging=('--debug' in ui), quiet=('--quiet' in ui))
 db = bearton.db.db(path=SITE_PATH).load()
 config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
 

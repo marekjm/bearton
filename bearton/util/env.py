@@ -11,6 +11,14 @@ try: import readline
 except ImportError: pass # These are not the modules you're looking for... Move along. (The OS is most probably Windows in such case.)
 finally: pass
 
+from bearton import errors
+
+
+SHARED_RESOURCES_LOCATIONS = [
+    (os.path.expanduser('~'), '.local', 'share', 'bearton'),
+    ('/', 'usr', 'share', 'bearton'),
+]
+
 
 def expandoutput(s):
     """Expand output path, replacing every variable found in it with its value.
@@ -34,39 +42,75 @@ def expandoutput(s):
     return s
 
 
-def getschemespath(cwd='.'):
-    path = ''
-    paths = [(cwd, '.bearton', 'schemes'),
-             (os.path.expanduser('~'), '.local', 'share', 'bearton', 'schemes'),
-             ('/', 'usr', 'share', 'bearton', 'schemes'),
-    ]
-    for p in paths:
-        if os.path.isdir(os.path.join(*p)):
-            path = os.path.join(*p)
-            break
-    return path
-
-def getuipath(cwd=''):
-    path = ''
-    paths = [(os.path.expanduser('~'), '.local', 'share', 'bearton', 'ui'),
-             ('/', 'usr', 'share', 'bearton', 'ui'),
-             (cwd, 'ui'),
-    ]
-    if cwd: paths.insert(0, paths.pop(-1))
-    for p in paths:
-        if os.path.isdir(os.path.join(*p)):
-            path = os.path.join(*p)
-            break
-    return path
-
-def getuimodel(filename):
-    """Takes a filename (from the __file__ of the calling script) and
-    returns a tuple: (extracted-filename, ui-model)
+def getrepopath(start='.', nofail=False):
+    """Returns path to the Bearton repo.
+    Raises exception if repository cannot be found.
     """
-    filename = os.path.splitext(os.path.split(filename)[-1])[0]
-    uipath = os.path.join(getuipath(), '{0}.clap.json'.format(filename))
+    base, path = os.path.abspath(start), ''
+    while os.path.split(base)[1] != '':
+        path = base[:]
+        if os.path.isdir(os.path.join(base, '.bearton')): break
+        base, path = os.path.split(base)[0], ''
+    if not path and not nofail: raise errors.RepositoryNotFoundError(os.path.abspath(start))
+    return os.path.join((path if path else start), '.bearton')
+
+
+def getresourcelocations():
+    """Returns list of locations where Bearton shared resources can be found.
+    """
+    paths = [os.path.join(*i) for i in SHARED_RESOURCES_LOCATIONS]
+    return paths
+
+
+def _getschemeslocations(repo):
+    """Returns list of possible schemes locations.
+    """
+    paths = getresourcelocations()
+    paths.insert(0, (getrepopath(start=start), '.bearton'))
+    paths = [os.path.join(i, 'schemes') for i in paths]
+    return paths
+
+def getschemespath(repo):
+    """Returns path to schemes directory.
+    Raises exception if not found.
+    """
+    path = ''
+    paths = _getschemeslocations()
+    for p in paths:
+        candidate = os.path.join(*p)
+        if os.path.isdir(candidate):
+            path = candidate
+            break
+    if not path: raise errors.SchemesDirectoryNotFoundError(start)
+    return path
+
+
+def _getuilocations():
+    """Returns list of possible UI locations.
+    """
+    paths = getresourcelocations()
+    paths = [os.path.join(i, 'ui') for i in paths]
+    return paths
+
+def getuipath():
+    """Return path to UI descriptions directory.
+    Raise exception if not found.
+    """
+    path = ''
+    paths = _getuilocations()
+    for p in paths:
+        if os.path.isdir(p):
+            path = p
+            break
+    if not path: raise errors.UIDescriptionsNotFoundError()
+    return path
+
+def getuimodel(ui):
+    """Takes a filename and returns a tuple: (path-to-ui-description, ui-model)
+    """
+    path = os.path.join(getuipath(), '{0}.clap.json'.format(ui))
     try:
-        ifstream = open(uipath, 'r')
+        ifstream = open(path, 'r')
         model = json.loads(ifstream.read())
         ifstream.close()
         err = None
@@ -74,25 +118,6 @@ def getuimodel(filename):
         err = e
     finally:
         if err is not None:
-            raise type(err)('failed to read UI description located at "{0}": {1}'.format(uipath, err))
-    return (filename, model)
-
-def getrepopath(start='.'):
-    """Returns path to the bearton repo or empty string if path cannot be found.
-    """
-    base, path = os.path.abspath(path), ''
-    while os.path.split(base)[1] != '':
-        path = base[:]
-        if os.path.isdir(os.path.join(base, '.bearton')): break
-        base, path = os.path.split(base)[0], ''
-    if not path: errors.RepositoryNotFound(os.path.abspath(start))
-    return path
-
-
-def inrepo(path='.', panic=False):
-    """Returns true if given directory can be used as by Bearton as repository, false otherwise.
-    If `panic` parameter is true, will raise exception with appropriate message.
-    """
-    usable = getrepopath(path) != ''
-    if not usable and panic: raise exceptions.BeartonError('"{0}" is not a bearton repository (and no parent is)'.format(os.path.abspath(path)))
-    return usable
+            raise type(err)('failed to read UI description located at "{0}": {1}'.format(path, err))
+    if not path: raise errors.UIDescriptionsNotFoundError(ui)
+    return model

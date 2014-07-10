@@ -9,68 +9,62 @@ from . import util
 from . import config
 
 
-def _newdirs(target, msgr):
+REQUIRED_REPO_DIRECTORIES = [
+    ('',),
+    ('schemes',),
+    ('db',),
+    ('db', 'pages'),
+    ('db', 'base'),
+    ('tmp',),
+    ('..', 'assets',),
+    ('..', 'data',),
+]
+
+
+def _gendirs(target, messenger):
     """Create require directories.
     """
-    dirs = [('.bearton',),
-            ('.bearton', 'schemes'),
-            ('.bearton', 'db'),
-            ('.bearton', 'db', 'pages'),
-            ('.bearton', 'db', 'base'),
-            ('.bearton', 'tmp'),
-            ('assets',),
-            ('data',),
-            ]
-    for parts in dirs:
-        path = os.path.join(target, *parts)
+    for parts in REQUIRED_REPO_DIRECTORIES:
+        path = os.path.normpath(os.path.join(target, *parts))
         if not os.path.isdir(path):
+            if messenger is not None: messenger.debug('creating: {0}'.format(path))
             os.mkdir(path)
-            msgr.debug('creating: {0}'.format(path))
 
-def _newconf(target, msgr):
+def _newconf(target, messenger):
     """Create empty config file.
     """
-    print('target:', target)
-    config.Configuration(target).default().store().unload()
-    msgr.debug('written default config file to {0}'.format(os.path.join(target, '.bearton', 'config.json')))
+    cnfg = config.Configuration(target).default().store()
+    if messenger is not None: messenger.debug('written default config file to {0}'.format(cnfg._path))
 
-def _copyschemes(target, schemes_path, msgr):
-    """Copy schemes to new Bearton local site repository.
-    """
-    msgr.debug('schemes are copied from: {0}'.format(schemes_path))
-    for scheme in os.listdir(schemes_path): shutil.copytree(os.path.join(schemes_path, scheme), os.path.join(target, '.bearton', 'schemes', scheme))
-
-def new(target, schemes='', msgr=None):
+def new(target, messenger=None):
     """Creates a new Bearton local repo.
     """
-    if not os.path.isdir(target): raise NotADirectoryError(target)
-    _newdirs(target, msgr)
-    _newconf(target, msgr)
-    if schemes: _copyschemes(target, schemes, msgr)
+    _gendirs(target, messenger)
+    _newconf(target, messenger)
 
-def update(target, msgr):
+def update(target, messenger):
     """Updates Bearton repository, e.g. creates new directories required by more recent version of Bearton suite.
     """
-    _newdirs(target, msgr)
+    _newdirs(target, messenger)
 
-def rm(target, msgr):
-    for part in ['assets', 'data']:
-        path = os.path.join(target, part)
-        if os.path.isdir(path):
-            shutil.rmtree(path)
-            msgr.debug('removed: {0}'.format(path))
-    path = os.path.join(target, '.bearton')
-    msgr.debug('possible Bearton repo in: {0} ({1})'.format(path, os.path.isdir(path)))
-    if os.path.isdir(path):
-        shutil.rmtree(path)
-        msgr.message('removed Bearton local from {0}'.format(path), 1)
+#def rm(target, msgr):
+#   for part in ['assets', 'data']:
+#        path = os.path.join(target, part)
+#        if os.path.isdir(path):
+#            shutil.rmtree(path)
+#            if messenger is not None: messenger.debug('removed: {0}'.format(path))
+#    path = os.path.join(target, '.bearton')
+#    if messenger is not None: messenger.debug('possible Bearton repo in: {0} ({1})'.format(path, os.path.isdir(path)))
+#    if os.path.isdir(path):
+#        shutil.rmtree(path)
+#        if messenger is not None: messenger.message('removed Bearton local from {0}'.format(path), 1)
 
-def syncschemes(target, schemes, wanted, msgr):
-    for w in wanted:
-        targetpath = os.path.join(target, w)
-        sourcepath = os.path.join(schemes, w)
-        if os.path.isdir(targetpath):
-            msgr.message('removing scheme "{0}" from {1}'.format(w, target), 1)
-            shutil.rmtree(targetpath)
-        msgr.message('copying scheme "{0}" from {1}'.format(w, schemes), 1)
-        shutil.copytree(sourcepath, targetpath)
+#def syncschemes(target, schemes, wanted, msgr):
+#    for w in wanted:
+#        targetpath = os.path.join(target, w)
+#        sourcepath = os.path.join(schemes, w)
+#        if os.path.isdir(targetpath):
+#            if messenger is not None: messenger.message('removing scheme "{0}" from {1}'.format(w, target), 1)
+#            shutil.rmtree(targetpath)
+#        if messenger is not None: messenger.message('copying scheme "{0}" from {1}'.format(w, schemes), 1)
+#        shutil.copytree(sourcepath, targetpath)

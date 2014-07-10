@@ -11,3 +11,8 @@ check-python:
 
 tests:
 	python3 ./tests/util.py ${PYTHON_UNITTEST_FLAGS}
+	python3 ./tests/initialisation.py ${PYTHON_UNITTEST_FLAGS}
+
+
+install:
+	python3 install.py

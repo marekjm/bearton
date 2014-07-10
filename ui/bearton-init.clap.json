@@ -3,20 +3,9 @@
         "help": "Tool used to manage Bearton repositories.",
         "usage": [
             "init [option...]",
-            "init [--schemes <schemes-path> | --no-schemes]",
-            "init [--target <directory>]",
-            "rm",
-            "sync [--schemes <path>]"
+            "init [--target <directory>]"
         ],
         "examples": [
-            {
-                "line": "init --no-schemes",
-                "desc": "Initialize empty repository with no schemes."
-            },
-            {
-                "line": "init --schemes <directory>",
-                "desc": "After init, copy schemes from <directory> given."
-            },
             {
                 "line": "init --update",
                 "desc": "Update repository structure adding missing elements as needed."
@@ -26,20 +15,8 @@
                 "desc": "Reinitialize repository, removing old one if found."
             },
             {
-                "line": "rm",
-                "desc": "Traditional interface for removing Bearton repositories."
-            },
-            {
                 "line": "init --clean --no-write",
                 "desc": "An alias for 'rm'; combination of init options that actually removes the repository. Used by people with too much time."
-            },
-            {
-                "line": "sync --schemes <directory>",
-                "desc": "Update currently used schemes with newer versions from the <directory> given."
-            },
-            {
-                "line": "sync --schemes <directory> --all",
-                "desc": "Update local schemes database with all schemes from <directory>."
             }
         ]
     },
@@ -63,39 +40,6 @@
                         "long": "no-write",
                         "requires": ["--clean"],
                         "help": "prevents directories and config files from being written, using 'bearton-init init --clean --no-write' is equivalent of removing the repo"
-                    },
-                    {
-                        "short": "S",
-                        "long": "schemes",
-                        "arguments": ["str"],
-                        "conflicts": ["--no-schemes"],
-                        "help": "set location of the schemes, they will be copied from there (overrides default)"
-                    },
-                    {
-                        "short": "N",
-                        "long": "no-schemes",
-                        "help": "do not copy schemes"
-                    }
-                ]
-            }
-        },
-        "rm": {
-            "doc": {"help": "Mode used to remove Bearton repositories."}
-        },
-        "sync": {
-            "doc": {"help": "Mode used to update Bearton repositories."},
-            "options": {
-                "local": [
-                    {
-                        "short": "s",
-                        "long": "schemes",
-                        "arguments": ["str"],
-                        "help": "sync schemes, copy new versions from this directory"
-                    },
-                    {
-                        "short": "a",
-                        "long": "all",
-                        "help": "copy all schemes"
                     }
                 ]
             }

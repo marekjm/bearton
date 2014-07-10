@@ -4,6 +4,9 @@ import shutil
 import sys
 
 
+TESTING = '--testing' in sys.argv or '-t' in sys.argv
+
+
 def install():
     # Install bearton modules
     home = os.path.expanduser('~')
@@ -41,6 +44,9 @@ def install():
         print('cp:', source.ljust(width), '->', target)
         shutil.copy(source, target)
 
+    if TESTING:
+        print('NOTICE: for testing purposes UIs and shared resources are not being installed: run install.py without -t/--testing option to install them')
+        return
     # Install default Bearton scheme
     share_path = os.path.join(home, '.local', 'share', 'bearton')
     if not os.path.isdir(share_path): os.mkdir(share_path)
