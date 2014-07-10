@@ -1,8 +1,47 @@
 {
     "doc": {
         "help": "Tool used to manage Bearton repositories.",
-        "usage": [],
-        "examples": []
+        "usage": [
+            "init [option...]",
+            "init [--schemes <schemes-path> | --no-schemes]",
+            "init [--target <directory>]",
+            "rm",
+            "sync [--schemes <path>]"
+        ],
+        "examples": [
+            {
+                "line": "init --no-schemes",
+                "desc": "Initialize empty repository with no schemes."
+            },
+            {
+                "line": "init --schemes <directory>",
+                "desc": "After init, copy schemes from <directory> given."
+            },
+            {
+                "line": "init --update",
+                "desc": "Update repository structure adding missing elements as needed."
+            },
+            {
+                "line": "init --clean",
+                "desc": "Reinitialize repository, removing old one if found."
+            },
+            {
+                "line": "rm",
+                "desc": "Traditional interface for removing Bearton repositories."
+            },
+            {
+                "line": "init --clean --no-write",
+                "desc": "An alias for 'rm'; combination of init options that actually removes the repository. Used by people with too much time."
+            },
+            {
+                "line": "sync --schemes <directory>",
+                "desc": "Update currently used schemes with newer versions from the <directory> given."
+            },
+            {
+                "line": "sync --schemes <directory> --all",
+                "desc": "Update local schemes database with all schemes from <directory>."
+            }
+        ]
     },
     "commands": {
         "init": {

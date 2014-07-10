@@ -1,8 +1,50 @@
 {
     "doc": {
         "help": "Interface to Bearton configuration file.",
-        "usage": [],
-        "examples": []
+        "usage": [
+            "<command> [option...] [operand...]",
+            "(--verbose | --quiet) <command> [option...] [operand...]",
+            "--debug <command> [option...] [operand...]",
+            "help --examples"
+        ],
+        "examples": [
+            {
+                "line": "set <key>",
+                "desc": "Set a single key with no value, just make it present. Value defaults to empty string."
+            },
+            {
+                "line": "set <key> <value>",
+                "desc": "Set the <key> to <value>. Key is either created or has its value updated."
+            },
+            {
+                "line": "rm <key>...",
+                "desc": "Remove keys specified as operands."
+            },
+            {
+                "line": "rm --pop --key <key> | rm -pk <key>",
+                "desc": "Remove key and print its value to the screen."
+            },
+            {
+                "line": "set <new-key> $(bearton-config rm -pk <old-key>)",
+                "desc": "A quick way to rename a key."
+            },
+            {
+                "line": "get [--json] <key>",
+                "desc": "To get <key>'s value, optionally JSON-encoded."
+            },
+            {
+                "line": "get [--json] --list",
+                "desc": "Get list of all keys in the config file, optionally JSON-encoded."
+            },
+            {
+                "line": "get --verbose --list | -lv",
+                "desc": "Get all <key>=<value> pairs in the config file printed to the screen."
+            },
+            {
+                "line": "get --verbose --json --list | get -vjl",
+                "desc": "Get JSON-encoded dictionary containing all of config file fields."
+            }
+        ]
     },
     "commands": {
         "get": {

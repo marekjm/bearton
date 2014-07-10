@@ -1,29 +1,5 @@
 ## tool: `bearton-init`
 
-`bearton-init` is used to perform initializatio-related tasks, including:
-
-- initialization,
-- reinitialization,
-- deinitialization (a.k.a. removal),
-
-To see quick help use `bearton-init --help`.
-
-----
-
-### Initializing a repository
-
-Initializization is performed with `bearton-init init` mode.
-It should be accompanied by `--schemes` option to point it to a directory from which schemes should be copied.
-Alternatively, it can be supplied with `--no-schemes` option, in whcih case Bearton will not try to copy any schemes.
-
-```
-bearton-init init [--schemes <path> | --no-schemes] [--target <path>]
-```
-
-`--target` option should be used only for testing purposes:
-
-----
-
 ### Updating a repository
 
 Sometimes, a newer version of Bearton introduces changes to the repository structure.

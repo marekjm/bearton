@@ -4,6 +4,7 @@ import os
 from . import util
 from .exceptions import *
 
+DEFAULT = {'scheme': 'default'}
 
 class Configuration:
     """Class implementing interface to Bearton site configuration.
@@ -35,9 +36,9 @@ class Configuration:
         base, path = os.path.abspath(self._path), ''
         while True and os.path.split(base)[1] != '':
             path = os.path.join(base, '.bearton', 'config.json')
-            if os.path.isfile(path): break
+            if os.path.isfile(path) or os.path.isdir(base): break
             base, path = os.path.split(base)[0], ''
-        if not path: path = None
+        print('config path is:', path)
         return path
 
     def guard(self):
@@ -69,7 +70,7 @@ class Configuration:
             Configuration._guarded = guard
             Configuration._guard = self
         self._path = self._getpath()
-        conf = (json.loads(util.readfile(self._path)) if self._path is not None else None)
+        conf = (json.loads(util.readfile(self._path, default=json.dumps(DEFAULT))) if self._path is not None else None)
         if conf is not None: self._conf = conf
         else: self.default()
         return self
@@ -83,13 +84,15 @@ class Configuration:
     def default(self):
         """Return configuration to default state.
         """
-        self._conf = {'scheme': 'default'}
+        self._conf = {}
+        for k, v in DEFAULT.items(): self._conf[k] = v
         return self
 
     def store(self):
         """Stores configration file and
         writes any changes made.
         """
+        print('writing conf to: {0}'.format(self._path))
         if Configuration._guarded is not True and self._conf is not None and self._path is not None: util.writefile(path=self._path, s=json.dumps(self._conf))
         return self
 

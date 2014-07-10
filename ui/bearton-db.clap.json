@@ -1,11 +1,51 @@
 {
     "doc": {
         "help": "Interface to Bearton database.",
-        "usage": [],
-        "examples": []
+        "usage": [
+            "query [--with-output] [[<scheme>] <element>]",
+            "query -e <element> -s <scheme>",
+            "query --format \"<format>\"",
+            "query --raw <query>",
+            "update",
+            "update --erase",
+            "help --examples"
+        ],
+        "examples": [
+            {
+                "line": "query [--with-output]",
+                "desc": "Show IDs of all pages, optionally with their output paths."
+            },
+            {
+                "line": "query <element>",
+                "desc": "Show IDs of all pages of element's type <element>."
+            },
+            {
+                "line": "query <scheme> <element>",
+                "desc": "Show IDs of all pages of element's type <element> and scheme <scheme>."
+            },
+            {
+                "line": "query -- format <format>",
+                "desc": "Use specified <format> whe printing lines out, consult manual for more information about formats."
+            },
+            {
+                "line": "query --raw <query>",
+                "desc": "Use raw, hand-crafted query <query> to look for page IDs. See manual for more information about raw queries."
+            },
+            {
+                "line": "update [--context-edits-log <file>]",
+                "desc": "Update contexts of entries in the database. Optionally, put their IDs into the <file> provided by the option."
+            },
+            {
+                "line": "update --erase [--yes]",
+                "desc": "Erase the database. Bearton will ask for confirmation, unless --yes option is provided."
+            }
+        ]
     },
     "commands": {
         "query": {
+            "doc": {
+                "help": "Perform a query to Bearton's database to retrieve IDs of pages."
+            },
             "options": {
                 "local": [
                     {
@@ -52,6 +92,9 @@
             }
         },
         "update": {
+            "doc": {
+                "help": "Perform update of the database."
+            },
             "options": {
                 "local": [
                     {

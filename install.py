@@ -17,6 +17,7 @@ def install():
              ('bearton', 'page'),
              ('bearton', 'schemes'),
              ('bearton', 'servers'),
+             ('bearton', 'util'),
     ]
 
     files = []
@@ -26,6 +27,7 @@ def install():
         ipath = os.path.join(path, *i)
         if not os.path.isdir(ipath):
             os.mkdir(ipath)
+    files = sorted(files)
 
     width = 0
     for f in files:

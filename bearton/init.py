@@ -30,8 +30,9 @@ def _newdirs(target, msgr):
 def _newconf(target, msgr):
     """Create empty config file.
     """
-    config.Configuration(os.path.join(target, '.bearton', 'config.json')).default().store().unload()
-    msgr.debug('written default config file to {0}'.format(os.path.join(target, '.bearton')))
+    print('target:', target)
+    config.Configuration(target).default().store().unload()
+    msgr.debug('written default config file to {0}'.format(os.path.join(target, '.bearton', 'config.json')))
 
 def _copyschemes(target, schemes_path, msgr):
     """Copy schemes to new Bearton local site repository.
