@@ -1,20 +1,42 @@
 {
     "doc": {
         "help": "Tool used to manage Bearton schemes.",
-        "usage": [],
-        "examples": []
+        "usage": [
+            "[<command>] [<option>...]",
+            "help --examples"
+        ],
+        "examples": [
+            {
+                "line": "ls --group",
+                "desc": "Display all available schemes, grouped by directories where they are stored."
+            },
+            {
+                "line": "ls --mark-current",
+                "desc": "Mark currently used scheme."
+            },
+            {
+                "line": "inspect [--elements] --buildable",
+                "desc": "List all buildable elements of a scheme, i.e. elements that can be instantiated and rendered. The --elements is optional as it is implied by --buildable."
+            },
+            {
+                "line": "inspect [--elements] --base",
+                "desc": "List all base elements of a scheme, i.e. elements that cannot be instantiated. The --elements is optional as it is implied by --base."
+            },
+            {
+                "line": "",
+                "desc": ""
+            },
+            {
+                "line": "apply [--force] <scheme>",
+                "desc": "Apply selected <scheme> to the webpage. Optionally, --force the change, i.e. remove everything that is present and create structure from scratch."
+            }
+        ]
     },
     "commands": {
         "apply": {
             "doc": {"help": "Apply scheme to page."},
             "options": {
                 "local": [
-                    {
-                        "short": "n",
-                        "long": "name",
-                        "arguments": ["str"],
-                        "help": "name of the theme to apply (default: the name set in site's config)"
-                    },
                     {
                         "short": "f",
                         "long": "force",
@@ -23,7 +45,7 @@
                 ]
             },
             "operands": {
-                "no": [0, 0]
+                "no": [-1]
             }
         },
         "rm": {
@@ -44,11 +66,13 @@
                     {
                         "short": "b",
                         "long": "buildable",
+                        "implies": ["--elements"],
                         "help": "list only buildable elements"
                     },
                     {
                         "short": "B",
                         "long": "base",
+                        "implies": ["--elements"],
                         "help": "list only base elements"
                     },
                     {
@@ -77,6 +101,12 @@
                         "long": "group",
                         "short": "g",
                         "help": "group schemes by directory in which they are placed"
+                    },
+                    {
+                        "long": "details",
+                        "short": "D",
+                        "implies": ["--group"],
+                        "help": "display some details about each scheme"
                     }
                 ]
             }

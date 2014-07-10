@@ -66,28 +66,30 @@ if clap.helper.HelpRunner(ui=ui, program=_file).run().displayed(): exit()
 
 if not ui.islast(): ui = ui.down()
 msgr.setVerbosity(ui.get('-v') if '--verbose' in ui else 0)
+msgr.setDebug('--debug' in ui)
 
 # --------------------------------------
 #   Per-mode UI logic code goes HERE!  |
 # --------------------------------------
 if str(ui) == 'apply':
+    cnfg = bearton.config.Configuration(bearton.util.env.getrepopath(TARGET)).load()
     name = ''
-    if 'scheme' in config: name = config.get('scheme')
+    if 'scheme' in cnfg: name = cnfg.get('scheme')
     if ui.operands(): name= ui.operands()[0]
-    if '--name' in ui: name = ui.get('-n')
 
-    if name:
-        msgr.debug('defined name of the scheme: {0}'.format(name))
     if not name:
         msgr.message('fatal: cannot define name of the scheme to apply')
         exit(1)
-    if name not in os.listdir(SCHEMES_PATH):
-        msgr.message('fatal: coud not find scheme "{0}" in {1}'.format(name, SCHEMES_PATH))
-        if '--schemes' not in ui: msgr.message('note: try setting different schemes location with -S/--schemes option')
+    if name not in [schm for schm, path in bearton.util.env.listschemes(bearton.util.env.getschemespaths(TARGET))]:
+        msgr.message('fatal: coud not find scheme "{0}"'.format(name))
         exit(1)
-
-    if '--force' in ui: bearton.schemes.loader.rm(os.path.join(SCHEMES_PATH, name), SITE_PATH, msgr)
-    bearton.schemes.loader.apply(os.path.join(SCHEMES_PATH, name), SITE_PATH, msgr)
+    if name: msgr.debug('defined name of the scheme: {0}'.format(name))
+    source = ''
+    for schm, path in bearton.util.env.listschemes(bearton.util.env.getschemespaths(TARGET)):
+        if schm == name:
+            source = os.path.join(path, schm)
+            break
+    bearton.schemes.loader.apply(source, TARGET, msgr)
 elif str(ui) == 'rm':
     name = (config.get('scheme') if 'scheme' in config else '')
     if not name:
@@ -95,7 +97,8 @@ elif str(ui) == 'rm':
         exit(1)
     bearton.schemes.loader.rm(os.path.join(SCHEMES_PATH, name), SITE_PATH, msgr)
 elif str(ui) == 'inspect':
-    name = (config.get('scheme') if 'scheme' in config else '')
+    cnfg = bearton.config.Configuration(bearton.util.env.getrepopath(TARGET)).load()
+    name = (cnfg.get('scheme') if 'scheme' in config else '')
     if not name:
         msgr.message('fatal: cannot define name of the scheme to inspect')
         exit(1)
@@ -131,9 +134,9 @@ elif str(ui) == 'ls':
             groups[path].append(schm)
         for path in sorted(groups.keys()):
             msgr.message('  {0}'.format(path))
-            for schm in sorted(groups[path]): msgr.message('   {1} {0}'.format(schm, ('+' if schm == cnfg.get('scheme') else '-')))
+            for schm in sorted(groups[path]): msgr.message('   {1} {0}'.format(schm, ('+' if (schm == cnfg.get('scheme') and '--mark-current' in ui) else ' ')))
     else:
         for schm, path in schemes:
-            msg = ' {1} {0}'.format(schm, ('+' if schm == cnfg.get('scheme') else ' '))
+            msg = ' {1} {0}'.format(schm, ('+' if (schm == cnfg.get('scheme') and '--mark-current' in ui) else ' '))
             if '--verbose' in ui: msg = '{0} :: {1}'.format(msg, path)
             msgr.message(msg)
