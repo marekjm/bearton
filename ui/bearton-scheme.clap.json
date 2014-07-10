@@ -29,7 +29,7 @@
         "rm": {
             "doc": {"help": "Remove scheme."},
             "operands": {
-                "no": [0, 0]
+                "no": [-1]
             }
         },
         "inspect": {
@@ -60,6 +60,25 @@
             },
             "operands": {
                 "no": [0, 0]
+            }
+        },
+        "ls": {
+            "doc": {
+                "help": "Get information about available schemes."
+            },
+            "options": {
+                "local": [
+                    {
+                        "long": "mark-current",
+                        "short": "m",
+                        "help": "mark the scheme currently in use"
+                    },
+                    {
+                        "long": "group",
+                        "short": "g",
+                        "help": "group schemes by directory in which they are placed"
+                    }
+                ]
             }
         }
     },

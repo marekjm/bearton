@@ -53,8 +53,15 @@ def install():
 
     schemes_path = os.path.join(share_path, 'schemes')
     print('installing schemes in:', schemes_path)
-    if os.path.isdir(schemes_path): shutil.rmtree(schemes_path)
-    shutil.copytree('./schemes', schemes_path)
+    if not os.path.isdir(schemes_path): os.mkdir(schemes_path)
+    for i in os.listdir('./schemes'):
+        target = os.path.join(schemes_path, i)
+        if os.path.isdir(target):
+            shutil.rmtree(target)
+            print('updating scheme: {0}'.format(i))
+        else:
+            print('installing scheme: {0}'.format(i))
+        shutil.copytree(os.path.join('.', 'schemes', i), target)
 
     ui_path = os.path.join(share_path, 'ui')
     print('installing ui descriptions in:', ui_path)

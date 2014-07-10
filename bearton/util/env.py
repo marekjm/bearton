@@ -15,6 +15,7 @@ from bearton import errors
 
 
 SHARED_RESOURCES_LOCATIONS = [
+    ('.',),
     (os.path.expanduser('~'), '.local', 'share', 'bearton'),
     ('/', 'usr', 'share', 'bearton'),
 ]
@@ -62,28 +63,24 @@ def getresourcelocations():
     return paths
 
 
-def _getschemeslocations(repo):
+def getschemespaths(repo=''):
     """Returns list of possible schemes locations.
     """
     paths = getresourcelocations()
-    paths.insert(0, (getrepopath(start=start), '.bearton'))
+    if repo: paths.insert(0, os.path.join(getrepopath(start=repo, nofail=True)))
     paths = [os.path.join(i, 'schemes') for i in paths]
+    paths = [i for i in paths if os.path.isdir(i)]
     return paths
 
-def getschemespath(repo):
-    """Returns path to schemes directory.
-    Raises exception if not found.
+def listschemes(scheme_paths):
+    """List all available schemes in all locations.
     """
-    path = ''
-    paths = _getschemeslocations()
-    for p in paths:
-        candidate = os.path.join(*p)
-        if os.path.isdir(candidate):
-            path = candidate
-            break
-    if not path: raise errors.SchemesDirectoryNotFoundError(start)
-    return path
-
+    #scheme_paths = getschemespaths(repo)
+    schemes = []
+    for path in scheme_paths:
+        ls = os.listdir(path)
+        for schm in ls: schemes.append( (schm, path) )
+    return schemes
 
 def _getuilocations():
     """Returns list of possible UI locations.
