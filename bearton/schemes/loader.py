@@ -52,25 +52,3 @@ def apply(source, target, messenger=None):
     _copyassets(source, target, messenger)
     _copydata(source, target, messenger)
     _makedirs(source, target, messenger)
-
-
-#def _rmdirs(source, target, messenger=None):
-#    meta = json.loads(util.readfile(os.path.join(source, 'meta.json')))
-#    dirs = (meta['dirs'] if 'dirs' in meta else [])
-#    dirs.reverse()
-#    if messenger is not None: messenger.debug('removing {0} directorie(s) required by scheme...'.format(len(dirs)))
-#    for d in dirs:
-#        path = os.path.join(target, d)
-#        if not os.path.isdir(path):
-#            if messenger is not None: messenger.debug('warning: directory did not exist: {0}'.format(path))
-#        else:
-#            if messenger is not None: messenger.debug('removing directory: {0}'.format(path))
-#            shutil.rmtree(path)
-
-#def rm(source, target, messenger=None):
-#    for i in ['assets', 'data']:
-#        path = os.path.join(target, i)
-#        if messenger is not None: messenger.debug('removing {0} from: {1}'.format(i, path))
-#        if os.path.isdir(path): shutil.rmtree(path)
-#        else: if messenger is not None: messenger.debug('warning: directory does not exist: {0}'.format(path))
-#    _rmdirs(source, target, messenger)
