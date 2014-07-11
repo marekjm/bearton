@@ -2,6 +2,7 @@
 
 import json
 import os
+import shutil
 from sys import argv
 
 import clap
@@ -11,7 +12,8 @@ import bearton
 
 
 # Obtaining requred filename and model
-_file, model = bearton.util.getuimodel(__file__)
+_file = os.path.splitext(os.path.split(__file__)[1])[0]
+model = bearton.util.env.getuimodel(_file)
 
 # Building UI
 argv = list(clap.formatter.Formatter(argv[1:]).format())
@@ -46,14 +48,9 @@ finally:
 
 # Setting constants for later use
 TARGET = os.path.abspath(ui.get('-t') if '--target' in ui else '.')
-SITE_PATH = bearton.util.getrepopath(TARGET)
-SCHEMES_PATH = (ui.get('-S') if '--schemes' in ui else bearton.util.getschemespath(cwd=SITE_PATH))
-
 
 # Creating widely used objects
-msgr = bearton.util.Messenger(verbosity=(ui.get('-v') if '--verbose' in ui else 0), debugging=('--debug' in ui), quiet=('--quiet' in ui))
-db = bearton.db.db(path=SITE_PATH).load()
-config = bearton.config.Configuration(path=SITE_PATH).load(guard=True)
+msgr = bearton.util.messenger.Messenger(verbosity=(ui.get('-v') if '--verbose' in ui else 0), debugging=('--debug' in ui), quiet=('--quiet' in ui))
 
 
 # -----------------------------
@@ -67,11 +64,13 @@ if '--version' in ui:
 if clap.helper.HelpRunner(ui=ui, program=_file).run().displayed(): exit()
 
 if not ui.islast(): ui = ui.down()
+msgr.setVerbosity(ui.get('-v') if '--verbose' in ui else 0)
+msgr.setDebug('--debug' in ui)
 
 # --------------------------------------
 #   Per-mode UI logic code goes HERE!  |
 # --------------------------------------
-if bearton.util.inrepo(path=TARGET) and str(ui) == 'new':
+if str(ui) == 'new':
     """This mode is employed for creating new pages.
     """
     # Obtaining scheme and element
@@ -139,7 +138,7 @@ if bearton.util.inrepo(path=TARGET) and str(ui) == 'new':
     if '--edit' in ui: bearton.page.page.edit(path=SITE_PATH, page=hashed, base=('--base' in ui), msgr=msgr)
     else: msgr.message(hashed, 0)
     if '--render' in ui: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=hashed, msgr=msgr)
-elif bearton.util.inrepo(path=TARGET) and str(ui) == 'edit':
+elif str(ui) == 'edit':
     """This mode is employed for editing existing pages.
     """
     page_id = ''
@@ -170,7 +169,7 @@ elif bearton.util.inrepo(path=TARGET) and str(ui) == 'edit':
     if '--render' in ui:
         for i in [i for i in ids if i != '']:
             bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=i, msgr=msgr)
-elif bearton.util.inrepo(path=TARGET) and str(ui) == 'render':
+elif str(ui) == 'render':
     """This mode is used to render individua pages, groups of pages or whole sites.
     """
     pages = (db.keys() if '--all' in ui else ui.operands())
@@ -198,7 +197,7 @@ elif bearton.util.inrepo(path=TARGET) and str(ui) == 'render':
             rendered = bearton.page.builder.render(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
             if '--print' in ui: msgr.message(rendered, 0)
         else: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
-elif bearton.util.inrepo(path=TARGET) and str(ui) == 'rm':
+elif str(ui) == 'rm':
     """This mode is used to remove pages from database.
     """
     page_id = ''
@@ -209,12 +208,3 @@ elif bearton.util.inrepo(path=TARGET) and str(ui) == 'rm':
         exit(1)
     msgr.message('removing page {0}'.format(page_id), 1)
     warnings.warn('IMPLEMENT ME!')
-else:
-    try: bearton.util.inrepo(path=TARGET, panic=True)
-    except bearton.exceptions.BeartonError as e: msgr.message('fatal: {0}'.format(e))
-    finally: pass
-
-
-# Storing widely used objects state
-config.store().unload()
-db.store().unload()

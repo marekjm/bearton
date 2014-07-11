@@ -23,10 +23,6 @@
                 "desc": "List all base elements of a scheme, i.e. elements that cannot be instantiated. The --elements is optional as it is implied by --base."
             },
             {
-                "line": "",
-                "desc": ""
-            },
-            {
                 "line": "apply [--force] <scheme>",
                 "desc": "Apply selected <scheme> to the webpage. Optionally, --force the change, i.e. remove everything that is present and create structure from scratch."
             }
@@ -48,37 +44,31 @@
                 "no": [-1]
             }
         },
-        "rm": {
-            "doc": {"help": "Remove scheme."},
-            "operands": {
-                "no": [-1]
-            }
-        },
         "inspect": {
             "doc": {"help": "Get information about scheme."},
             "options": {
                 "local": [
                     {
-                        "short": "e",
                         "long": "elements",
+                        "short": "e",
                         "help": "list all elements of a scheme"
                     },
                     {
-                        "short": "b",
                         "long": "buildable",
+                        "short": "b",
                         "implies": ["--elements"],
-                        "help": "list only buildable elements"
+                        "help": "list only buildable elements (implies --elements)"
                     },
                     {
-                        "short": "B",
                         "long": "base",
+                        "short": "B",
                         "implies": ["--elements"],
-                        "help": "list only base elements"
+                        "help": "list only base elements (implies --elements)"
                     },
                     {
                         "long": "not",
                         "wants": ["--buildable", "--base"],
-                        "help": "negate modifier"
+                        "help": "invert --buildable or --base option"
                     }
                 ]
             },
@@ -139,6 +129,7 @@
             {
                 "short": "q",
                 "long": "quiet",
+                "conflicts": ["--verbose"],
                 "help": "do not print normal messages"
             },
             {

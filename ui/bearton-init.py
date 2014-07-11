@@ -48,7 +48,6 @@ finally:
 
 # Setting constants for later use
 TARGET = os.path.abspath(ui.get('-t') if '--target' in ui else '.')
-#msgr.debug('target set to: {0}'.format(TARGET))
 
 # Creating widely used objects
 msgr = bearton.util.messenger.Messenger(verbosity=(ui.get('-v') if '--verbose' in ui else 0), debugging=('--debug' in ui), quiet=('--quiet' in ui))

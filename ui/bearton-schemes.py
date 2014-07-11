@@ -48,7 +48,6 @@ finally:
 
 # Setting constants for later use
 TARGET = os.path.abspath(ui.get('-t') if '--target' in ui else '.')
-#msgr.debug('target set to: {0}'.format(TARGET))
 
 # Creating widely used objects
 msgr = bearton.util.messenger.Messenger(verbosity=(ui.get('-v') if '--verbose' in ui else 0), debugging=('--debug' in ui), quiet=('--quiet' in ui))
@@ -76,7 +75,6 @@ if str(ui) == 'apply':
     name = ''
     if 'scheme' in cnfg: name = cnfg.get('scheme')
     if ui.operands(): name= ui.operands()[0]
-
     if not name:
         msgr.message('fatal: cannot define name of the scheme to apply')
         exit(1)
@@ -90,20 +88,21 @@ if str(ui) == 'apply':
             source = os.path.join(path, schm)
             break
     bearton.schemes.loader.apply(source, TARGET, msgr)
-elif str(ui) == 'rm':
-    name = (config.get('scheme') if 'scheme' in config else '')
-    if not name:
-        msgr.message('fatal: cannot define name of the scheme to remove')
-        exit(1)
-    bearton.schemes.loader.rm(os.path.join(SCHEMES_PATH, name), SITE_PATH, msgr)
 elif str(ui) == 'inspect':
     cnfg = bearton.config.Configuration(bearton.util.env.getrepopath(TARGET)).load()
-    name = (cnfg.get('scheme') if 'scheme' in config else '')
+    name = (cnfg.get('scheme') if 'scheme' in cnfg else '')
+    if ui.operands(): name = ui.operands()[0]
     if not name:
         msgr.message('fatal: cannot define name of the scheme to inspect')
         exit(1)
+    if name not in [schm for schm, path in bearton.util.env.listschemes(bearton.util.env.getschemespaths(TARGET))]:
+        msgr.message('fatal: coud not find scheme "{0}"'.format(name))
+        exit(1)
+    path = os.path.join([path for schm, path in bearton.util.env.listschemes(bearton.util.env.getschemespaths(TARGET)) if schm == name][0], name)
+    msgr.debug('defined name of the scheme: {0}'.format(name))
+    msgr.debug('defined path of the scheme: {0}'.format(path))
     if '--elements' in ui:
-        els = bearton.schemes.inspector.getElementMetas(name)
+        els = bearton.schemes.inspector.getElementMetas(path)
         if '--base' in ui:
             f = []
             for name, meta in els:
@@ -119,8 +118,7 @@ elif str(ui) == 'inspect':
                 if ok == 2: f.append( (name, meta) )
             if '--not' in ui: f = [i for i in els if i not in f]
             els = f[:]
-        output = str([name for name, meta in els])
-        msgr.message(output, 0)
+        for i in sorted([name for name, meta in els]): msgr.message(i)
 elif str(ui) == 'ls':
     """Mode used to list available schemes.
     """
