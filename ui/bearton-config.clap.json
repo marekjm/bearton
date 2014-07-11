@@ -76,47 +76,21 @@
         },
         "set": {
             "doc": {"help": "Mode used for setting information in configuration, e.g. setting new keys, changing their values etc."},
-            "options": {
-                "local": [
-                    {
-                        "short": "k",
-                        "long": "key",
-                        "arguments": ["str"],
-                        "help": "set value of key"
-                    },
-                    {
-                        "short": "V",
-                        "long": "value",
-                        "arguments": ["str"],
-                        "requires": ["--key"],
-                        "help": "give value to set"
-                    }
-                ]
-            },
-            "operands": {
-                "no": [0, 2]
-            }
+            "operands": {"no": [1, 2]}
         },
         "rm": {
             "doc": {"help": "Mode used for removing information from configuration"},
             "options": {
                 "local": [
                     {
-                        "short": "k",
-                        "long": "key",
-                        "arguments": ["str"],
-                        "help": "remove key from config"
-                    },
-                    {
                         "short": "p",
                         "long": "pop",
-                        "requires": ["--key"],
                         "help": "print value of the key before removing it"
                     }
                 ]
             },
             "operands": {
-                "no": [0, 0]
+                "no": [0]
             }
         }
     },
@@ -147,6 +121,7 @@
             {
                 "short": "q",
                 "long": "quiet",
+                "conflicts": ["--verbose"],
                 "help": "do not print normal messages"
             },
             {

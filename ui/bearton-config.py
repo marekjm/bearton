@@ -70,25 +70,18 @@ msgr.setDebug('--debug' in ui)
 # --------------------------------------
 #   Per-mode UI logic code goes HERE!  |
 # --------------------------------------
-if bearton.util.inrepo(path=TARGET) and str(ui) == 'get':
+config = bearton.config.Configuration(bearton.util.env.getrepopath(TARGET)).load()
+if str(ui) == 'get':
     if len(ui.operands()) > 1:
         msgr.message('fail: invalid number of operands: expected at most 1 but got {0}'.format(len(ui.operands())))
         exit(1)
     if '--list' in ui:
-        if '--verbose' in ui:
-            output = dict(config.kvalues())
+        if '--verbose' in ui: output = dict(config.items())
+        else: output = config.keys()
+        if '--json' in ui: msgr.message(json.dumps(output), 0)
         else:
-            output = config.keys()
-        if '--json' in ui:
-            output = json.dumps(output)
-            msgr.message(output, 0)
-        else:
-            if '--verbose' in ui:
-                tmp = []
-                for k, v in output.items(): tmp.append('{0}={1}'.format(k, v))
-                output = tmp
-            for i in output:
-                msgr.message(i, 0)
+            if '--verbose' in ui: output = ['{0}={1}'.format(k, v) for k, v in output.items()]
+            for i in output: msgr.message(i, 0)
     elif '--key' in ui:
         output = config.get(ui.get('-k'))
         if '--json' in ui: output = json.dumps(output)
@@ -97,27 +90,18 @@ if bearton.util.inrepo(path=TARGET) and str(ui) == 'get':
         output = config.get(ui.operands()[0])
         if '--json' in ui: output = json.dumps(output)
         msgr.message(output, 0)
-elif bearton.util.inrepo(path=TARGET) and str(ui) == 'set':
+elif str(ui) == 'set':
     if len(ui.operands()) > 2:
         msgr.message('fail: invalid number of operands: expected at most 2 but got {0}'.format(len(ui.operands())))
     else:
         key, value = '', ''
-        if ui.operands(): key = ui.operands().pop(0)
-        if ui.operands(): value = ui.operands().pop(0)
-        if '--key' in ui: key = ui.get('-k')
-        if '--value' in ui: value = ui.get('-v')
-        msgr.debug('{0} -> {1}'.format(key, value))
-        if key: config.unguard().set(key, value).guard()
-elif bearton.util.inrepo(path=TARGET) and str(ui) == 'rm':
-    keys = [k for k in ui.operands()]
-    if '--key' in ui: keys = [ui.get('-k')]
-    config.unguard()
-    if '--pop' in ui:
-        msgr.message(config.pop(keys[0]), 0)
-    else:
-        for k in keys: config.remove(k)
-    config.guard()
-else:
-    try: bearton.util.inrepo(path=TARGET, panic=True)
-    except bearton.exceptions.BeartonError as e: msgr.message('fatal: {0}'.format(e))
-    finally: pass
+        operands = ui.operands()
+        if operands: key = operands.pop(0)
+        if operands: value = operands.pop(0)
+        msgr.debug('{0} -> {1}'.format(key, repr(value)))
+        if key: config.set(key, value).store()
+elif str(ui) == 'rm':
+    for k in ui.operands():
+        if '--pop' in ui: msgr.message(config.pop(k), 0)
+        else: config.remove(k)
+    config.store()
