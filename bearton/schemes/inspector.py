@@ -7,10 +7,14 @@ import os
 from .. import util
 
 
-def lselements(scheme):
+def lselements(path, scheme):
     """Returns a list of elements of given scheme.
+    Parameters:
+
+    - path:     path to the directory scheme is located in,
+    - scheme:   name of the scheme,
     """
-    return os.listdir(os.path.join(scheme, 'elements'))
+    return os.listdir(os.path.join(path, scheme, 'elements'))
 
 def getElementMetas(scheme):
     """Return list of two-tuples: (name, meta).
@@ -23,10 +27,10 @@ def getElementMetas(scheme):
         metas.append( (i, meta) )
     return metas
 
-def getElementMeta(scheme, element):
+def getElementMeta(path, scheme, element):
     """Returns meta of element in given scheme.
     """
-    return json.loads(util.io.read(os.path.join(scheme, 'elements', element, 'meta.json')))
+    return json.loads(util.io.read(os.path.join(path, scheme, 'elements', element, 'meta.json')))
 
 def getSchemeMeta(scheme):
     """Return meta of whole scheme.
