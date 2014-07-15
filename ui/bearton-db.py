@@ -70,7 +70,9 @@ msgr.setDebug('--debug' in ui)
 # --------------------------------------
 #   Per-mode UI logic code goes HERE!  |
 # --------------------------------------
-if bearton.util.inrepo(path=TARGET) and str(ui) == 'query':
+db = bearton.db.db(path=bearton.util.env.getrepopath(TARGET)).load()
+config = bearton.config.Configuration(bearton.util.env.getrepopath(TARGET)).load()
+if str(ui) == 'query':
     if '--raw' in ui:
         scheme, element, queryd, querytags = db._parsequery(ui.get('-r'))
     else:
@@ -95,7 +97,7 @@ if bearton.util.inrepo(path=TARGET) and str(ui) == 'query':
     else: signature = '{:key@}'
     if '--with-output' in ui: signature += ' {:output@meta}'
     for i in pages: msgr.message(db.get(i).getsignature(signature), 0)
-elif bearton.util.inrepo(path=TARGET) and str(ui) == 'update':
+elif str(ui) == 'update':
     if '--erase' in ui:
         really = ('yes' if '--yes' in ui else input('do you really want to wipe out the database? [y/n] '))
         really = (True if really.strip().lower() in ['y', 'yes'] else False)
@@ -103,7 +105,7 @@ elif bearton.util.inrepo(path=TARGET) and str(ui) == 'update':
             msgr.debug('cancelled database wipeout')
         else:
             db.erase()
-            msgr.debug('wiped database contents from: {0}'.format(os.path.join(SITE_PATH, '.bearton', 'db')))
+            msgr.debug('wiped database contents from: {0}'.format(os.path.join(bearton.util.env.getrepopath(TARGET), 'db')))
     else:
         metadata, contexts = db.update(SCHEMES_PATH)
         for name, value in [('metadata', metadata), ('context', contexts)]:

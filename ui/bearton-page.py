@@ -67,74 +67,84 @@ if not ui.islast(): ui = ui.down()
 msgr.setVerbosity(ui.get('-v') if '--verbose' in ui else 0)
 msgr.setDebug('--debug' in ui)
 
+msgr.debug('target directory: {0}'.format(bearton.util.env.getrepopath(TARGET)))
+
 # --------------------------------------
 #   Per-mode UI logic code goes HERE!  |
 # --------------------------------------
 if str(ui) == 'new':
     """This mode is employed for creating new pages.
     """
+    config = bearton.config.Configuration(bearton.util.env.getrepopath(TARGET)).load()
+    db = bearton.db.db(path=bearton.util.env.getrepopath(TARGET)).load()
     # Obtaining scheme and element
     opers = ui.operands()
     scheme = (config.get('scheme') if 'scheme' in config else 'default')
-    scheme = (opers.pop(1) if len(opers) == 2 else scheme)
-    element = (opers.pop(0) if opers else '')
-    if '--scheme' in ui: scheme = ui.get('-s')
-    if '--element' in ui: element = ui.get('-e')
+    scheme = (opers.pop(0) if len(opers) == 2 else scheme)
+    element = opers.pop(0)
 
-    fail = False
-    if not element: fail = True
+    # Report requested set of scheme:element
+    msgr.debug('requested element: "{0}"'.format(element))
+    msgr.debug('requested scheme:  "{0}"{1}'.format(scheme, ('' if len(ui.operands()) == 2 else ' (loaded from config)')))
 
-    els = bearton.schemes.inspector.lselements(scheme=config.get('scheme'))
-    if element not in els and element != '' and '--element' not in ui:
-        # try to find appropriate element for string supplied, e.g. yield `article` for supplied `art`
-        # but only if element is not explicitly specified
+    # Check if scheme can be found and used
+    schemes = bearton.util.env.listschemes(bearton.util.env.getschemespaths(TARGET))
+    scheme_path = ''
+    for schm, path in schemes:
+        if schm == scheme:
+            scheme_path = path
+            break
+    if not scheme_path:
+        msgr.message('fatal: scheme "{0}" have not been found'.format(scheme))
+        exit(1)
+    msgr.debug('using scheme "{0}" from "{1}"'.format(scheme, scheme_path))
+
+    # Obtain list of elements available in scheme
+    elements = bearton.schemes.inspector.lselements(path=scheme_path, scheme=scheme)
+    msgr.debug('available elements: {0}'.format(', '.join(sorted(elements))))
+
+    # Set final element to use
+    if element not in elements:
+        part, element = element[:], ''
+        # Try to find appropriate element for string supplied, e.g. yield `article` for supplied `art`
         candidates = []
-        for i in els:
-            if i.startswith(element): candidates.append(i)
+        for i in elements:
+            if i.startswith(part): candidates.append(i)
         if len(candidates) > 1:
-            msgr.debug('"{0}" is ambigious: resolves to more than one element'.format(element))
-            fail = True
+            msgr.debug('"{0}" is ambiguous: resolves to more than one element: {1}'.format(part, ', '.join(candidates)))
         elif len(candidates) < 1:
-            msgr.debug('"{0}" does not resolve to any element'.format(element))
-            fail = True
+            msgr.debug('"{0}" does not resolve to any element'.format(part))
         else:
-            msgr.debug('"{0}" resolved to: {1}'.format(element, candidates[0]))
+            msgr.debug('"{0}" resolved to: {1}'.format(part, candidates[0]))
             element = candidates.pop(0)
-    if fail:
+    if not element:
         msgr.message('fatal: cannot define what element to use')
         exit(1)
-
     # Performing necessary checks
-    element_meta = os.path.join(SCHEMES_PATH, scheme, 'elements', element, 'meta.json')
-    if not os.path.isfile(element_meta):
-        msgr.message('fatal: cannot find metadata for element {0} in scheme {1}'.format(element, scheme))
+    if not os.path.isfile(os.path.join(scheme_path, scheme, 'elements', element, 'meta.json')):
+        msgr.message('fatal: cannot find metadata for element "{0}" in scheme "{1}"'.format(element, scheme))
         exit(1)
-    element_meta = json.loads(bearton.util.readfile(element_meta))
+    element_meta = bearton.schemes.inspector.getElementMeta(scheme_path, scheme, element)
+    msgr.debug('loaded metadata for element from: {0}'.format(os.path.join(scheme_path, scheme, 'elements', element, 'meta.json')))
     if '--base' in ui:
-        if element_meta['base'] == False or 'base' not in element_meta:
+        if 'base' not in element_meta or element_meta['base'] == False:
             msgr.message('fatal: cannot add page as a base element', 0)
             exit(1)
-    if '--base' in ui and element in os.listdir(os.path.join(SITE_PATH, '.bearton', 'db', 'base')):
-        msgr.message('fatal: base element \'{0}\' already created: try \'bearton page edit -bp {0}\' command'.format(element), 0)
-        exit(1)
+        if element in os.listdir(os.path.join(bearton.util.env.getrepopath(TARGET), 'db', 'base')):
+            msgr.message('fatal: base element "{0}" already created: try "bearton page edit -b {0}" command'.format(element), 0)
+            exit(1)
     if 'singular' in element_meta:
         if element_meta['singular'] and len(db.query(scheme, element)) > 0:
             msgr.message('failed to create new element of type "{0}": element is singular'.format(element), 0)
             exit(1)
-    if 'bare' in element_meta:
-        if element_meta['bare']:
-            msgr.message('fatal: cannot create db entry for bare element: {0}'.format(element), 0)
-            exit(1)
-
-    # Debugging info
-    msgr.debug('using scheme path: {0}'.format(SCHEMES_PATH))
-    msgr.debug('using scheme: {0}'.format(scheme))
-    msgr.debug('using element: {0}'.format(element))
-    msgr.debug('target directory: {0}'.format(SITE_PATH))
+    if 'bare' in element_meta and element_meta['bare']:
+        msgr.message('fatal: cannot create db entry for bare element: {0}'.format(element), 0)
+        exit(1)
 
     # Actual call creating new page in database
     creator = (bearton.page.page.newbase if '--base' in ui else bearton.page.page.new)
-    hashed = creator(path=SITE_PATH, schemes_path=SCHEMES_PATH, scheme=scheme, element=element, msgr=msgr)
+    hashed = creator(target=bearton.util.env.getrepopath(TARGET), use=(scheme_path, scheme, element), messenger=msgr)
+    exit(2)
     if '--edit' in ui: bearton.page.page.edit(path=SITE_PATH, page=hashed, base=('--base' in ui), msgr=msgr)
     else: msgr.message(hashed, 0)
     if '--render' in ui: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=hashed, msgr=msgr)

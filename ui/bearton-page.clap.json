@@ -1,26 +1,27 @@
 {
     "doc": {
         "help": "Tool used to manage Bearton pages.",
-        "usage": [],
-        "examples": []
+        "usage": [
+            "new [<scheme>] <page>",
+            "edit <id>",
+            "help --examples"
+        ],
+        "examples": [
+            {
+                "line": "new <page>",
+                "desc": "create new page with type <page> taken from current scheme"
+            },
+            {
+                "line": "new <page> <scheme>",
+                "desc": "create new page with type <page> taken from scheme <scheme>"
+            }
+        ]
     },
     "commands": {
         "new": {
             "doc": {"help": "Mode used to create new pages."},
             "options": {
                 "local": [
-                    {
-                        "short": "s",
-                        "long": "scheme",
-                        "arguments": ["str"],
-                        "help": "use given scheme to create the page"
-                    },
-                    {
-                        "short": "e",
-                        "long": "element",
-                        "arguments": ["str"],
-                        "help": "use given element to create the page, even if string does not point to any element Bearton will not try to match it"
-                    },
                     {
                         "short": "b",
                         "long": "base",
@@ -40,7 +41,7 @@
                 ]
             },
             "operands": {
-                "no": [0, 2]
+                "no": [1, 2]
             }
         },
         "edit": {
@@ -48,15 +49,8 @@
             "options": {
                 "local": [
                     {
-                        "short": "p",
-                        "long": "page-id",
-                        "arguments": ["str"],
-                        "help": "specify page id"
-                    },
-                    {
                         "short": "b",
                         "long": "base",
-                        "requires": ["--page-id"],
                         "help": "tells Bearton it will be base element that needs editing"
                     },
                     {
@@ -68,13 +62,18 @@
                     {
                         "short": "r",
                         "long": "render",
-                        "help": "re-render the page after editing"
+                        "help": "(re)render the page after editing"
                     },
                     {
                         "short": "m",
                         "long": "markdown",
                         "arguments": ["str"],
-                        "help": "edit Markdown entry with given <name>"
+                        "help": "edit entry's Markdown part with given <name>"
+                    },
+                    {
+                        "short": "j",
+                        "long": "json",
+                        "help": "edit JSON of the entry"
                     }
                 ]
             },
@@ -83,20 +82,9 @@
             }
         },
         "rm": {
-           "doc": { "help": "Mode used to remove pages."},
-            "options": {
-                "local": [
-                    {
-                        "short": "p",
-                        "long": "page-id",
-                        "arguments": ["str"],
-                        "required": true,
-                        "help": "specify page id"
-                    }
-                ]
-            },
+            "doc": {"help": "Mode used to remove pages."},
             "operands": {
-                "no": [-1]
+                "no": [0]
             }
         },
         "render": {
