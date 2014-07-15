@@ -29,17 +29,17 @@ class Entry:
                 'base': False,
                 'bare': False
                 }
-        loaded = json.loads(util.readfile(os.path.join(epath, 'meta.json')))
-        self._meta = util.dictmerge(meta, loaded, removals=False)
+        loaded = json.loads(util.io.read(os.path.join(epath, 'meta.json'), default=json.dumps(meta)))
+        self._meta = util.dicts.merge(meta, loaded, removals=False)
         if self._meta['bare'] or self._meta['base']: self._meta['singular'] = True
         try:
-            self._context = json.loads(util.readfile(os.path.join(epath, 'context.json')))
             err = None
-        except ValueError as e:
+            self._context = json.loads(util.io.read(os.path.join(epath, 'context.json')))
+        except (Exception) as e:
             err = e
         finally:
             if err is not None:
-                raise type(err)('error while loading context: "{0}": {1}'.format(os.path.join(epath, 'context.json'), err))
+                raise type(err)('error while loading context for "{0}": {1}'.format(self._entry, err))
         return self
 
     def _updatemeta(self, schemes):
@@ -123,8 +123,8 @@ class Entry:
         """
         epath = os.path.join(self._path, self._entry)
         if self._changed:
-            util.writefile(os.path.join(epath, 'meta.json'), json.dumps(self._meta), encoding=None)
-            util.writefile(os.path.join(epath, 'context.json'), json.dumps(self._context), encoding=None)
+            util.io.write(os.path.join(epath, 'meta.json'), json.dumps(self._meta), encoding=None)
+            util.io.write(os.path.join(epath, 'context.json'), json.dumps(self._context), encoding=None)
         for d in ['markdown']:
             path = os.path.join(epath, d)
             if not os.path.isdir(path): os.mkdir(path)
@@ -270,7 +270,7 @@ class DatabaseOfPages(Database):
     """Database of page-type elements.
     """
     def __setpath__(self, path):
-        self._path = os.path.join(path, '.bearton', 'db', 'pages')
+        self._path = os.path.join(path, 'db', 'pages')
         self._rawpath = path
 
 
