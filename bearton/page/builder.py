@@ -92,7 +92,7 @@ def render(path, schemes, page, msgr):
     renderer = muspyche.renderer.Renderer(parsed, context, lookup)
     if markdown is not None:
         # apply Markdown post-renderer for out-of-the-box Markdown support for
-        # Markdown partials (e.g. articles)
+        # Markdown partials (e.g. articles written in Markdown)
         renderer.addpost('^markdown/', markdown.markdown)
     return renderer.render()
 
