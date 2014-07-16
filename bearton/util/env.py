@@ -63,7 +63,7 @@ def getresourcelocations():
     return paths
 
 
-def getschemespaths(repo=''):
+def getschemespaths(repo='.'):
     """Returns list of possible schemes locations.
     """
     paths = getresourcelocations()
