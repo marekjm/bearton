@@ -52,8 +52,13 @@ class Configuration:
         if self._conf is not None and self._path is not None: util.io.write(path=self._path, s=json.dumps(self._conf))
         return self
 
-    def get(self, key):
-        return self[key]
+    def get(self, key, default=None):
+        """Return value of `key` if `key` is present, raise `KeyError` otherwise.
+        If default is provided, and key is not found this value is returned instead of
+        exception being raised.
+        """
+        if key not in self and default is None: raise KeyError(key)
+        return (self[key] if key in self else default)
 
     def set(self, key, value):
         self[key] = value
