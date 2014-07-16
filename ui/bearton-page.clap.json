@@ -1,6 +1,6 @@
 {
     "doc": {
-        "help": "Tool used to manage Bearton pages.",
+        "help": "Tool used to manage Bearton pages. Maximal number of --verbose switches that makes sense in this command is two (it has more fine-grained control over error reporting).",
         "usage": [
             "new [<scheme>] <page>",
             "edit <id>",
@@ -14,6 +14,14 @@
             {
                 "line": "new <page> <scheme>",
                 "desc": "create new page with type <page> taken from scheme <scheme>"
+            },
+            {
+                "line": "render --all --carry-on | -aC",
+                "desc": "Render all pages and try to run as far as is possible by skipping ones that cause errors."
+            },
+            {
+                "line": "render --all --dry-run --verbose | -avD",
+                "desc": "Dry-run render all pages. The --verbose switch is used to print more error messages."
             }
         ]
     },
@@ -92,25 +100,31 @@
             "options": {
                 "local": [
                     {
-                        "short": "a",
                         "long": "all",
+                        "short": "a",
                         "help": "build all pages (a rebuilt of the site)"
                     },
                     {
-                        "short": "t",
                         "long": "type",
+                        "short": "t",
                         "arguments": ["str"],
                         "conflicts": ["--all"],
                         "help": "build all pages of given type"
                     },
                     {
                         "long": "dry-run",
+                        "short": "D",
                         "help": "render pages but do not write them to output files"
                     },
                     {
                         "long": "print",
                         "requires": ["--dry-run"],
                         "help": "print rendered HTML while dry running"
+                    },
+                    {
+                        "long": "carry-on",
+                        "short": "C",
+                        "help": "keep running by skipping pages that cause errors"
                     }
                 ]
             },

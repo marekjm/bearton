@@ -72,35 +72,37 @@ msgr.debug('target directory: {0}'.format(bearton.util.env.getrepopath(TARGET)))
 # --------------------------------------
 #   Per-mode UI logic code goes HERE!  |
 # --------------------------------------
+db = bearton.db.db(path=bearton.util.env.getrepopath(TARGET)).load()
+config = bearton.config.Configuration(bearton.util.env.getrepopath(TARGET)).load()
 if str(ui) == 'new':
     """This mode is employed for creating new pages.
     """
-    config = bearton.config.Configuration(bearton.util.env.getrepopath(TARGET)).load()
-    db = bearton.db.db(path=bearton.util.env.getrepopath(TARGET)).load()
     # Obtaining scheme and element
     opers = ui.operands()
-    scheme = (config.get('scheme') if 'scheme' in config else 'default')
-    scheme = (opers.pop(0) if len(opers) == 2 else scheme)
+    scheme_name = (config.get('scheme') if 'scheme' in config else 'default')
+    scheme_name = (opers.pop(0) if len(opers) == 2 else scheme_name)
     element = opers.pop(0)
 
     # Report requested set of scheme:element
     msgr.debug('requested element: "{0}"'.format(element))
-    msgr.debug('requested scheme:  "{0}"{1}'.format(scheme, ('' if len(ui.operands()) == 2 else ' (loaded from config)')))
+    msgr.debug('requested scheme:  "{0}"{1}'.format(scheme_name, ('' if len(ui.operands()) == 2 else ' (loaded from config)')))
 
     # Check if scheme can be found and used
     schemes = bearton.util.env.listschemes(bearton.util.env.getschemespaths(TARGET))
     scheme_path = ''
     for schm, path in schemes:
-        if schm == scheme:
+        if schm == scheme_name:
             scheme_path = path
             break
     if not scheme_path:
-        msgr.message('fatal: scheme "{0}" have not been found'.format(scheme))
+        msgr.message('fatal: scheme "{0}" have not been found'.format(scheme_name))
         exit(1)
-    msgr.debug('using scheme "{0}" from "{1}"'.format(scheme, scheme_path))
+    msgr.debug('using scheme "{0}" from "{1}"'.format(scheme_name, scheme_path))
+    # Setting final scheme variable
+    scheme = os.path.join(scheme_path, scheme_name)
 
     # Obtain list of elements available in scheme
-    elements = bearton.schemes.inspector.lselements(path=scheme_path, scheme=scheme)
+    elements = bearton.schemes.inspector.lselements(scheme)
     msgr.debug('available elements: {0}'.format(', '.join(sorted(elements))))
 
     # Set final element to use
@@ -121,11 +123,11 @@ if str(ui) == 'new':
         msgr.message('fatal: cannot define what element to use')
         exit(1)
     # Performing necessary checks
-    if not os.path.isfile(os.path.join(scheme_path, scheme, 'elements', element, 'meta.json')):
-        msgr.message('fatal: cannot find metadata for element "{0}" in scheme "{1}"'.format(element, scheme))
+    if not os.path.isfile(os.path.join(scheme, 'elements', element, 'meta.json')):
+        msgr.message('fatal: cannot find metadata for element "{0}" in scheme "{1}": {2}'.format(element, scheme_name, scheme_path))
         exit(1)
-    element_meta = bearton.schemes.inspector.getElementMeta(scheme_path, scheme, element)
-    msgr.debug('loaded metadata for element from: {0}'.format(os.path.join(scheme_path, scheme, 'elements', element, 'meta.json')))
+    element_meta = bearton.schemes.inspector.getElementMeta(scheme, element)
+    msgr.debug('loaded metadata for element from: {0}'.format(os.path.join(scheme, 'elements', element, 'meta.json')))
     if '--base' in ui:
         if 'base' not in element_meta or element_meta['base'] == False:
             msgr.message('fatal: cannot add page as a base element', 0)
@@ -133,8 +135,12 @@ if str(ui) == 'new':
         if element in os.listdir(os.path.join(bearton.util.env.getrepopath(TARGET), 'db', 'base')):
             msgr.message('fatal: base element "{0}" already created: try "bearton page edit -b {0}" command'.format(element), 0)
             exit(1)
+    if '--base' not in ui:
+        if 'base' in element_meta and element_meta['base']:
+            msgr.message('fatal: cannot create page instance ("{0}" is a base element)'.format(element), 0)
+            exit(1)
     if 'singular' in element_meta:
-        if element_meta['singular'] and len(db.query(scheme, element)) > 0:
+        if element_meta['singular'] and len(db.query(scheme_name, element)) > 0:
             msgr.message('failed to create new element of type "{0}": element is singular'.format(element), 0)
             exit(1)
     if 'bare' in element_meta and element_meta['bare']:
@@ -143,7 +149,7 @@ if str(ui) == 'new':
 
     # Actual call creating new page in database
     creator = (bearton.page.page.newbase if '--base' in ui else bearton.page.page.new)
-    hashed = creator(target=bearton.util.env.getrepopath(TARGET), use=(scheme_path, scheme, element), messenger=msgr)
+    hashed = creator(target=bearton.util.env.getrepopath(TARGET), use=(scheme, element), messenger=msgr)
     exit(2)
     if '--edit' in ui: bearton.page.page.edit(path=SITE_PATH, page=hashed, base=('--base' in ui), msgr=msgr)
     else: msgr.message(hashed, 0)
@@ -182,31 +188,51 @@ elif str(ui) == 'edit':
 elif str(ui) == 'render':
     """This mode is used to render individua pages, groups of pages or whole sites.
     """
+    # Obtain pages user wants to render
     pages = (db.keys() if '--all' in ui else ui.operands())
     if '--type' in ui: pages = [key for key, entry in db.query(scheme=config.get('scheme'), element=ui.get('-t'))]
+
+    # Get existing page IDs
     existing = db.keys()
+
+    # Check pages requested to rendered really exist
+    errors = []
     for page in pages:
         if page not in db.keys():
             candidates = [k for k in db.keys() if k.startswith(page)]
             if len(candidates) > 1:
-                msgr.message('fail: id "{0}" resolves to more than one element'.format(id))
+                msgr.message('fail: id "{0}" resolves to more than one element'.format(page), 2)
             elif len(candidates) == 0:
-                msgr.message('fail: id "{0}" does not resolve to any element'.format(id))
+                msgr.message('fail: id "{0}" does not resolve to any element'.format(page), 2)
             else:
                 page = candidates.pop(0)
         if page not in existing:
-            msgr.message('fail: page "{0}" does not exist'.format(page), 0)
-            if page in bearton.schemes.inspector.lselements(scheme=config.get('scheme')):
-                msgr.message('note: string "{0}" is a name of an element in currently used scheme:'.format(page), 1)
-                msgr.message(' * try \'bearton-db query {0}\' command to obtain IDs of pages created using this type'.format(page), 1)
-                msgr.message(' * try \'bearton-page render --type {0}\' command to render all pages of this type'.format(page), 1)
-            continue
-        else:
-            msgr.message('rendering page: {0}'.format(page), 1)
+            msgr.message('fail: page "{0}" does not exist (increase verbosity level to see exact reason)'.format(page), verbosity=1, max_verbosity=1)
+            scheme_path = os.path.join([path for schm, path in bearton.util.env.listschemes(bearton.util.env.getschemespaths(TARGET)) if schm == config.get('scheme', 'default')][0])
+            if page in bearton.schemes.inspector.lselements(path=scheme_path, scheme=config.get('scheme', 'default')):
+                msgr.message('note: string "{0}" is a name of an element in currently used scheme:'.format(page), verbosity=1, max_verbosity=2)
+                msgr.message(' * try \'bearton-db query {0}\' command to obtain IDs of pages created using this type'.format(page), verbosity=1, max_verbosity=2)
+                msgr.message(' * try \'bearton-page render --type {0}\' command to render all pages of this type'.format(page), verbosity=1, max_verbosity=2)
+            errors.append(page)
+            if '--carry-on' in ui: continue
+            else: break
+
+    # Remove error-causing pages from list if errors are disregarded or
+    # print these pages and exit
+    for e in errors: pages.remove(e)
+    if errors and '--carry-on' not in ui:
+        msgr.message('abort: some pages can not be rendered{0}'.format(' (rerun command with --verbose switch(es) added to see more detailed report)' if '--verbose' not in ui else ''))
+        exit(1)
+
+    # Render final list of pages
+    for page in pages:
+        msgr.message('rendering page: {0}'.format(page), 1)
+        rendered = bearton.page.builder.render(target=bearton.util.env.getrepopath(TARGET), page=page, messenger=msgr)
         if '--dry-run' in ui:
-            rendered = bearton.page.builder.render(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
             if '--print' in ui: msgr.message(rendered, 0)
-        else: bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
+        else:
+            msgr.message('FIX: actually writing pages to disk')
+            #bearton.page.builder.build(path=SITE_PATH, schemes=SCHEMES_PATH, page=page, msgr=msgr)
 elif str(ui) == 'rm':
     """This mode is used to remove pages from database.
     """

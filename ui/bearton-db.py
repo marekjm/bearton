@@ -93,7 +93,7 @@ if str(ui) == 'query':
     msgr.debug('query: scheme={0}, element={1}, queryd={2}, querytags={3}'.format(scheme, element, queryd, querytags))
     pages = (bearton.db.db(path=SITE_PATH, base=True).load() if '--base' in ui else db).query(scheme, element, queryd, querytags)
     pages = [key for key, entry in pages]
-    if '--verbose' in ui: signature = ('{:key@}: {:name@meta}@{:scheme@meta}' if '--format' not in ui else ui.get('-F'))
+    if '--verbose' in ui: signature = ('{:key@}: {:name@meta}@{:scheme@meta}:' if '--format' not in ui else ui.get('-F'))
     else: signature = '{:key@}'
     if '--with-output' in ui: signature += ' {:output@meta}'
     for i in pages: msgr.message(db.get(i).getsignature(signature), 0)
