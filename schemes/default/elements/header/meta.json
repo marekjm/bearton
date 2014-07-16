@@ -2,5 +2,6 @@
     "requires": {
         "contexts": []
     },
-    "base": true
+    "base": true,
+    "bare": true
 }
