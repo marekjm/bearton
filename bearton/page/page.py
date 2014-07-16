@@ -16,10 +16,10 @@ def new(target, use, messenger=None):
     place it in the database inside <target> repository.
     Use <messenger> for reporting.
 
-    The `use` parameter is a three-tuple: (directory-containing-scheme, scheme-name, element-name)
+    The `use` parameter is a two-tuple: (scheme-directory, element-name)
     """
-    scheme_path, scheme_name, scheme_element = use
-    element_path = os.path.join(scheme_path, scheme_name, 'elements', scheme_element)
+    scheme, element = use
+    element_path = os.path.join(scheme, 'elements', element)
     if messenger is not None: messenger.debug('reading element data from: {0}'.format(element_path))
     hashed = hashlib.sha256(base64.b64encode(os.urandom(64))).hexdigest()
     if messenger is not None: messenger.debug('setting unique id (database key) for new page: {0}'.format(hashed))
@@ -36,18 +36,24 @@ def new(target, use, messenger=None):
         if messenger is not None: messenger.call(shutil.copy, os.path.join(element_path, f), os.path.join(hashpath, f))
         if messenger is not None: messenger.report()
     entry = db.Entry(*os.path.split(hashpath)).load()
-    if 'scheme' not in entry._meta: entry.setinmeta('scheme', scheme)
+    if 'scheme' not in entry._meta: entry.setinmeta('scheme', os.path.split(scheme)[1])
     if 'name' not in entry._meta: entry.setinmeta('name', element)
-    entry.setinmeta('output', util.expandoutput(entry.metag('output')))
+    entry.setinmeta('output', util.env.expandoutput(entry.metag('output')))
     entry.store()
     return hashed
 
-def newbase(path, schemes_path, scheme, element, messenger=None):
-    if messenger is not None: messenger.debug('{0} {1}'.format(path, os.path.isdir(path)))
-    basepath = os.path.join(path, '.bearton', 'db', 'base', element)
+def newbase(target, use, messenger=None):
+    """Create new page using <use> data and
+    place it in the database inside <target> repository.
+    Use <messenger> for reporting.
+
+    The `use` parameter is a two-tuple: (scheme-directory, element-name)
+    """
+    scheme, element = use
+    basepath = os.path.join(target, 'db', 'base', element)
     os.mkdir(basepath)
     files = ['meta', 'context', 'hints']
-    element_path = os.path.join(schemes_path, scheme, 'elements', element)
+    element_path = os.path.join(scheme, 'elements', element)
     for f in files:
         f += '.json'
         if messenger is not None: messenger.debug('copying {0}'.format(f), keep=True)
