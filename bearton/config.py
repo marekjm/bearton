@@ -2,7 +2,7 @@ import json
 import os
 
 from . import util
-from .exceptions import *
+from .errors import *
 
 DEFAULT = {'scheme': 'default'}
 
